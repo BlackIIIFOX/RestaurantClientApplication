@@ -49,6 +49,17 @@ public class LoginRepository {
         if (result instanceof Result.Success) {
             setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
         }
+
+        return result;
+    }
+
+    public Result<LoggedInUser> login(String jwt) {
+        // handle login
+        Result<LoggedInUser> result = dataSource.login(jwt);
+        if (result instanceof Result.Success) {
+            setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
+        }
+
         return result;
     }
 }

@@ -10,7 +10,6 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,10 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tamagotchi.restaurantclientapplication.BaseActivity;
-import com.tamagotchi.restaurantclientapplication.MainActivity;
+import com.tamagotchi.restaurantclientapplication.StartActivity;
 import com.tamagotchi.restaurantclientapplication.R;
-import com.tamagotchi.restaurantclientapplication.ui.login.LoginViewModel;
-import com.tamagotchi.restaurantclientapplication.ui.login.LoginViewModelFactory;
 
 public class LoginActivity extends BaseActivity {
 
@@ -35,14 +32,18 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        // super.onBackPressed();
-        Intent activity2Intent = new Intent(getApplicationContext(), MainActivity.class);
+        super.onBackPressed();
+        Intent activity2Intent = new Intent(getApplicationContext(), StartActivity.class);
         startActivity(activity2Intent);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        Boolean isNewAccount = intent.getBooleanExtra("isNewAccount", false);
+
         setContentView(R.layout.activity_login);
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
