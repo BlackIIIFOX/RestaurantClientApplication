@@ -1,10 +1,7 @@
 package com.tamagotchi.tamagotchiserverprotocol;
 
-import android.content.Context;
-import android.util.JsonReader;
-
 import com.google.gson.Gson;
-import com.tamagotchi.tamagotchiserverprotocol.Models.UserModel;
+import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,27 +9,24 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.net.ssl.HttpsURLConnection;
-
 public class ServerProtocol implements IServerProtocol {
 
     @Override
-    public void CreateAccount(String login, String password) {
+    public void CreateUser(UserModel userModel) {
 
-        if (login == null || login.isEmpty())
+        if (userModel.getLogin() == null || userModel.getLogin().isEmpty())
             throw new IllegalArgumentException("login is empty or null");
 
-        if (password == null || password.isEmpty())
+        if (userModel.getPassword() == null || userModel.getPassword().isEmpty())
             throw new IllegalArgumentException("password is empty or null");
 
     }
 
-    public void GetAccountsTest() throws Exception {
+    public List<UserModel> GetUsers() throws Exception {
         URL restaurantEndpoint = new URL("http://192.168.56.1:3000/accounts");
 
         // Create connection
@@ -40,6 +34,7 @@ public class ServerProtocol implements IServerProtocol {
                 (HttpURLConnection) restaurantEndpoint.openConnection();
 
         myConnection.setRequestMethod("GET");
+        List<UserModel> users = null;
 
         /*
         * // Create the data
@@ -60,15 +55,22 @@ public class ServerProtocol implements IServerProtocol {
             InputStreamReader responseBodyReader =
                     new InputStreamReader(responseBody, "UTF-8");
 
-            List<UserModel> users = Arrays.asList(new Gson().fromJson(responseBodyReader, UserModel[].class));
+            users = Arrays.asList(new Gson().fromJson(responseBodyReader, UserModel[].class));
 
-            users.add(new UserModel());
+            //users.add(new UserModel());
 
         } else {
             // Error handling code goes here
         }
 
         myConnection.disconnect();
+
+        return users;
+    }
+
+    @Override
+    public void UpdateUser() throws Exception {
+
     }
 
     private void SendRequest() throws IOException {

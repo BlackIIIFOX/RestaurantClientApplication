@@ -1,9 +1,11 @@
 package com.tamagotchi.tamagotchiserverprotocol;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
+import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
+
+import java.util.List;
 
 public interface IServerProtocol {
-    void CreateAccount(String login, String password);
-    void GetAccountsTest() throws Exception;
+    void CreateUser(UserModel userModel);
+    List<UserModel> GetUsers() throws Exception;
+    void UpdateUser() throws Exception;
 }

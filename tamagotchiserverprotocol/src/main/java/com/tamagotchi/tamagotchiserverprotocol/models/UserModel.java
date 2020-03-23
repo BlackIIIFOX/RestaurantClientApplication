@@ -1,4 +1,4 @@
-package com.tamagotchi.tamagotchiserverprotocol.Models;
+package com.tamagotchi.tamagotchiserverprotocol.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
