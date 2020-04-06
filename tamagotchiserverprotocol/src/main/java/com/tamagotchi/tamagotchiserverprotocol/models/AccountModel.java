@@ -3,7 +3,7 @@ package com.tamagotchi.tamagotchiserverprotocol.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class UserModel {
+public class AccountModel {
 
     @SerializedName("id")
     @Expose
