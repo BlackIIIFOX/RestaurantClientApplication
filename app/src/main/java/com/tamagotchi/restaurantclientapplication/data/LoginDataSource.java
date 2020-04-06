@@ -2,7 +2,7 @@ package com.tamagotchi.restaurantclientapplication.data;
 
 import com.tamagotchi.restaurantclientapplication.data.model.LoggedInUser;
 import com.tamagotchi.tamagotchiserverprotocol.IRestaurantApiService;
-import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
+import com.tamagotchi.tamagotchiserverprotocol.models.AccountModel;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ public class LoginDataSource {
 
     private IRestaurantApiService restaurantApiService;
 
-    public LoginDataSource(IRestaurantApiService restaurantApiService) {
+    public LoginDataSource() {
 
         this.restaurantApiService = restaurantApiService;
     }
@@ -53,8 +53,8 @@ public class LoginDataSource {
     public Result<LoggedInUser> create(String login, String password) {
 
         try {
-            UserModel newUser = restaurantApiService.CreateUser(login, password);
-
+            //AccountModel newUser = restaurantApiService.CreateUser(login, password);
+            AccountModel newUser = null;
             return new Result.Success<>(newUser);
         } catch (Exception e) {
             return new Result.Error(new IOException("Error logging in", e));
