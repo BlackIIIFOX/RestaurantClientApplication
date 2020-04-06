@@ -53,6 +53,16 @@ public class LoginRepository {
         return result;
     }
 
+    public Result<LoggedInUser> create(String username, String password) {
+        // handle login
+        Result<LoggedInUser> result = dataSource.create(username, password);
+        if (result instanceof Result.Success) {
+            setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
+        }
+
+        return result;
+    }
+
     public Result<LoggedInUser> login(String jwt) {
         // handle login
         Result<LoggedInUser> result = dataSource.login(jwt);

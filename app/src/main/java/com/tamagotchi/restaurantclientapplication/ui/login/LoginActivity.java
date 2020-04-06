@@ -29,6 +29,7 @@ import com.tamagotchi.restaurantclientapplication.R;
 public class LoginActivity extends BaseActivity {
 
     private LoginViewModel loginViewModel;
+    private boolean isNewAccount;
 
     @Override
     public void onBackPressed() {
@@ -42,7 +43,7 @@ public class LoginActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        Boolean isNewAccount = intent.getBooleanExtra("isNewAccount", false);
+        isNewAccount = intent.getBooleanExtra("isNewAccount", false);
 
         setContentView(R.layout.activity_login);
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
@@ -116,6 +117,7 @@ public class LoginActivity extends BaseActivity {
                     loginViewModel.login(usernameEditText.getText().toString(),
                             passwordEditText.getText().toString());
                 }
+
                 return false;
             }
         });
@@ -124,8 +126,15 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-                loginViewModel.login(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
+
+                if (isNewAccount) {
+                    loginViewModel.create(usernameEditText.getText().toString(),
+                            passwordEditText.getText().toString());
+                }
+                else {
+                    loginViewModel.login(usernameEditText.getText().toString(),
+                            passwordEditText.getText().toString());
+                }
             }
         });
     }

@@ -25,6 +25,10 @@ public class UserModel {
     @Expose
     private String fullName;
 
+    @SerializedName("is_blocked")
+    @Expose
+    private String isBlocked;
+
     public int getId() {
         return id;
     }
@@ -59,5 +63,13 @@ public class UserModel {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getIsBlocked() {
+        return isBlocked;
+    }
+
+    public void setIsBlocked(String isBlocked) {
+        this.isBlocked = isBlocked;
     }
 }

@@ -32,9 +32,10 @@ public class StartActivity extends BaseActivity {
         Button buttonCreate = findViewById(R.id.buttonCreate);
         ProgressBar loading = findViewById(R.id.loading);
 
-        buttonLogin.setVisibility(View.GONE);
-        buttonCreate.setVisibility(View.GONE);
-        loading.setVisibility(View.VISIBLE);
+        //buttonLogin.setVisibility(View.GONE);
+        //buttonCreate.setVisibility(View.GONE);
+        //loading.setVisibility(View.VISIBLE);
+        loading.setVisibility(View.GONE);
 
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
