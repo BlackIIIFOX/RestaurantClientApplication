@@ -2,6 +2,7 @@ package com.tamagotchi.restaurantclientapplication.ui.login;
 
 import android.app.Activity;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -22,14 +23,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.restaurantclientapplication.ui.BaseActivity;
-import com.tamagotchi.restaurantclientapplication.StartActivity;
+import com.tamagotchi.restaurantclientapplication.ui.start.StartActivity;
 import com.tamagotchi.restaurantclientapplication.R;
 
 public class LoginActivity extends BaseActivity {
 
     private LoginViewModel loginViewModel;
     private boolean isNewAccount;
+    private LoginActivity context;
 
     @Override
     public void onBackPressed() {
@@ -41,6 +44,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
 
         Intent intent = getIntent();
         isNewAccount = intent.getBooleanExtra("isNewAccount", false);

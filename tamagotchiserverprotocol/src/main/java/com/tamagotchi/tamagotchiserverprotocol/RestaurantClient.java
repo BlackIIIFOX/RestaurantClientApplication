@@ -15,9 +15,9 @@ public class RestaurantClient {
     private static RestaurantClient instance = null;
     private Retrofit retrofit;
     private OkHttpClient client;
-    private String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6MCwiaWF0IjoxNTg1ODYyMTY5fQ.Oehrp9gvgMKsHES2ZYtIxCIX_I6o8uGJp4l39mXIejM";
+    private String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6Ik1hbmFnZXIiLCJpYXQiOjE1ODY5NzEyNTV9.lasbKegsStSGla3JY3dsIJLmQ2PriyGDh9kA8xA9Jds";
 
-    private IRestaurantApiService restaurantApiService;
+    private IAccountsApiService accountsService;
 
     private RestaurantClient() {
         OkHttpClient client = new OkHttpClient.Builder()
@@ -42,7 +42,7 @@ public class RestaurantClient {
                 .build();
 
 
-        restaurantApiService = retrofit.create(IRestaurantApiService.class);
+        accountsService = retrofit.create(IAccountsApiService.class);
     }
 
     public synchronized static RestaurantClient getInstance() {
@@ -53,7 +53,7 @@ public class RestaurantClient {
         return instance;
     }
 
-    public IRestaurantApiService getAccountService() {
-        return restaurantApiService;
+    public IAccountsApiService getAccountService() {
+        return accountsService;
     }
 }

@@ -1,5 +1,6 @@
-package com.tamagotchi.restaurantclientapplication;
+package com.tamagotchi.restaurantclientapplication.ui.start;
 
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.ui.BaseActivity;
 import com.tamagotchi.restaurantclientapplication.ui.login.LoginActivity;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
@@ -16,17 +18,17 @@ import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 public class StartActivity extends BaseActivity {
 
     static final int LOGIN_REQUEST = 1; // The request code.
-    private MainViewModel mainViewModel;
+    StartViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        mainViewModel = ViewModelProviders.of(this, new MainViewModelFactory())
-                .get(MainViewModel.class);
+        //mainViewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
+        //mainViewModel.StartServices();
 
-        mainViewModel.StartServices();
+        viewModel = new ViewModelProvider(this, new StartViewModelFactory()).get(StartViewModel.class);
 
         Button buttonLogin = findViewById(R.id.buttonLogin);
         Button buttonCreate = findViewById(R.id.buttonCreate);

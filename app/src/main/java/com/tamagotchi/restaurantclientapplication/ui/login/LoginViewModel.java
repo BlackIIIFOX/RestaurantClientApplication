@@ -2,23 +2,26 @@ package com.tamagotchi.restaurantclientapplication.ui.login;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import android.util.Patterns;
 
-import com.tamagotchi.restaurantclientapplication.data.LoginRepository;
+import com.tamagotchi.restaurantclientapplication.data.AccountsRepository;
 import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.restaurantclientapplication.data.model.LoggedInUser;
 import com.tamagotchi.restaurantclientapplication.R;
+import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
 
 public class LoginViewModel extends ViewModel {
 
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
-    private LoginRepository loginRepository;
+    private AccountsRepository accountsRepository;
 
-    LoginViewModel(LoginRepository loginRepository) {
-        this.loginRepository = loginRepository;
+    LoginViewModel(AccountsRepository accountsRepository) {
+        this.accountsRepository = accountsRepository;
     }
 
     LiveData<LoginFormState> getLoginFormState() {
@@ -31,26 +34,54 @@ public class LoginViewModel extends ViewModel {
 
     public void login(String username, String password) {
         // can be launched in a separate asynchronous job
-        Result<LoggedInUser> result = loginRepository.login(username, password);
+        /*Result<LoggedInUser> result = accountsRepository.login(username, password);
 
         if (result instanceof Result.Success) {
             LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
             loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
         } else {
             loginResult.setValue(new LoginResult(R.string.login_failed));
-        }
+        }*/
     }
 
     public void create(String username, String password) {
-        // can be launched in a separate asynchronous job
-        Result<LoggedInUser> result = loginRepository.create(username, password);
 
-        if (result instanceof Result.Success) {
-            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
-        } else {
-            loginResult.setValue(new LoginResult(R.string.login_failed));
-        }
+        LiveData<Result> resultLiveData = accountsRepository.createAccount(new SignInfoModel(username, password));
+
+        final Observer<Result> createdObserver = new Observer<Result>() {
+            @Override
+            public void onChanged(Result result) {
+                if (result instanceof Result.Success) {
+                    loginResult.setValue(new LoginResult(new LoggedInUserView("You")));
+                } else {
+                    loginResult.setValue(new LoginResult(R.string.login_failed));
+                }
+            }
+        };
+
+        resultLiveData.observeForever(createdObserver);
+
+        //return result;
+
+        //Transformations.switchMap(result, )
+
+        //AbsentLiveData
+        // can be launched in a separate asynchronous job
+        /*LiveData<Result> result = accountsRepository.createAccount(new SignInfoModel(username, password));
+
+        final Observer<Result> createdObserver = new Observer<Result>() {
+            @Override
+            public void onChanged(Result result) {
+                if (result instanceof Result.Success) {
+                    LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
+                    loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
+                } else {
+                    loginResult.setValue(new LoginResult(R.string.login_failed));
+                }
+            }
+        };
+
+        result.observe(new Lif, createdObserver);*/
     }
 
     public void loginDataChanged(String username, String password) {

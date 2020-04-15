@@ -2,8 +2,9 @@ package com.tamagotchi.tamagotchiserverprotocol.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.tamagotchi.tamagotchiserverprotocol.models.enums.Roles;
 
-public class AccountModel {
+public class AccountInfoModel {
 
     @SerializedName("id")
     @Expose
@@ -19,7 +20,7 @@ public class AccountModel {
 
     @SerializedName("role")
     @Expose
-    private int role;
+    private Roles role;
 
     @SerializedName("full_name")
     @Expose
@@ -37,7 +38,7 @@ public class AccountModel {
         return login;
     }
 
-    public int getRole() {
+    public Roles getRole() {
         return role;
     }
 
@@ -49,7 +50,7 @@ public class AccountModel {
         this.login = login;
     }
 
-    public void setRole(int role) {
+    public void setRole(Roles role) {
         this.role = role;
     }
 
