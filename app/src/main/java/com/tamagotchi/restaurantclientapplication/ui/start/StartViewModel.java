@@ -1,15 +1,26 @@
 package com.tamagotchi.restaurantclientapplication.ui.start;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.tamagotchi.restaurantclientapplication.data.AccountsRepository;
+import com.tamagotchi.restaurantclientapplication.data.Result;
+import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
 
 public class StartViewModel extends ViewModel {
 
-    private AccountsRepository accountsRepository;
+    private AuthenticationService authenticationService;
 
-    StartViewModel(AccountsRepository accountsRepository) {
-        this.accountsRepository = accountsRepository;
+    StartViewModel(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
+
+    public LiveData<Result> isAuthenticated() {
+        return authenticationService.isAuthenticated();
+    }
+
+    public void refreshAuthenticated() {
+        authenticationService.checkAuthenticate();
     }
 
 }

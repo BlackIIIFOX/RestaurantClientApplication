@@ -3,9 +3,8 @@ package com.tamagotchi.restaurantclientapplication.data;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-//import com.tamagotchi.restaurantclientapplication.data.model.AccountModel;
 import com.tamagotchi.restaurantclientapplication.data.model.LoggedInUser;
-import com.tamagotchi.tamagotchiserverprotocol.IAccountsApiService;
+import com.tamagotchi.tamagotchiserverprotocol.routers.IAccountsApiService;
 import com.tamagotchi.tamagotchiserverprotocol.models.AccountInfoModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
 

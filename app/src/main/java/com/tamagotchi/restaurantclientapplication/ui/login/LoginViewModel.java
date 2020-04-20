@@ -12,6 +12,8 @@ import com.tamagotchi.restaurantclientapplication.data.AccountsRepository;
 import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.restaurantclientapplication.data.model.LoggedInUser;
 import com.tamagotchi.restaurantclientapplication.R;
+import com.tamagotchi.restaurantclientapplication.data.model.LoginInfo;
+import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
 import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
 
 public class LoginViewModel extends ViewModel {
@@ -19,9 +21,11 @@ public class LoginViewModel extends ViewModel {
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
     private AccountsRepository accountsRepository;
+    private AuthenticationService authenticationService;
 
-    LoginViewModel(AccountsRepository accountsRepository) {
+    LoginViewModel(AccountsRepository accountsRepository, AuthenticationService authenticationService) {
         this.accountsRepository = accountsRepository;
+        this.authenticationService = authenticationService;
     }
 
     LiveData<LoginFormState> getLoginFormState() {
@@ -33,55 +37,34 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void login(String username, String password) {
-        // can be launched in a separate asynchronous job
-        /*Result<LoggedInUser> result = accountsRepository.login(username, password);
 
-        if (result instanceof Result.Success) {
-            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
-        } else {
-            loginResult.setValue(new LoginResult(R.string.login_failed));
-        }*/
+        LoginInfo loginInfo = new LoginInfo(username, password);
+        LiveData<Result> resultLiveData = authenticationService.authenticate(loginInfo);
+
+        final Observer<Result> createdObserver = result -> {
+            if (result instanceof Result.Success) {
+                loginResult.setValue(new LoginResult(new LoggedInUserView("You")));
+            } else {
+                loginResult.setValue(new LoginResult(R.string.login_failed));
+            }
+        };
+
+        resultLiveData.observeForever(createdObserver);
     }
 
     public void create(String username, String password) {
 
         LiveData<Result> resultLiveData = accountsRepository.createAccount(new SignInfoModel(username, password));
 
-        final Observer<Result> createdObserver = new Observer<Result>() {
-            @Override
-            public void onChanged(Result result) {
-                if (result instanceof Result.Success) {
-                    loginResult.setValue(new LoginResult(new LoggedInUserView("You")));
-                } else {
-                    loginResult.setValue(new LoginResult(R.string.login_failed));
-                }
+        final Observer<Result> createdObserver = result -> {
+            if (result instanceof Result.Success) {
+                loginResult.setValue(new LoginResult(new LoggedInUserView("You")));
+            } else {
+                loginResult.setValue(new LoginResult(R.string.login_failed));
             }
         };
 
         resultLiveData.observeForever(createdObserver);
-
-        //return result;
-
-        //Transformations.switchMap(result, )
-
-        //AbsentLiveData
-        // can be launched in a separate asynchronous job
-        /*LiveData<Result> result = accountsRepository.createAccount(new SignInfoModel(username, password));
-
-        final Observer<Result> createdObserver = new Observer<Result>() {
-            @Override
-            public void onChanged(Result result) {
-                if (result instanceof Result.Success) {
-                    LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-                    loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
-                } else {
-                    loginResult.setValue(new LoginResult(R.string.login_failed));
-                }
-            }
-        };
-
-        result.observe(new Lif, createdObserver);*/
     }
 
     public void loginDataChanged(String username, String password) {
@@ -108,6 +91,6 @@ public class LoginViewModel extends ViewModel {
 
     // A placeholder password validation check
     private boolean isPasswordValid(String password) {
-        return password != null && password.trim().length() > 5;
+        return password != null && password.trim().length() >= 5;
     }
 }

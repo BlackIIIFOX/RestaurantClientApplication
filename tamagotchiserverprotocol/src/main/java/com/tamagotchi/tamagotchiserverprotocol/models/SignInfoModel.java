@@ -3,6 +3,9 @@ package com.tamagotchi.tamagotchiserverprotocol.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Данные отправляемые при запросе аутентификации и регистрации.
+ */
 public class SignInfoModel {
     @SerializedName("login")
     @Expose

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.tamagotchi.restaurantclientapplication.data.AccountsRepository;
+import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
 import com.tamagotchi.tamagotchiserverprotocol.RestaurantClient;
 
 public class StartViewModelFactory implements ViewModelProvider.Factory  {
@@ -12,7 +13,11 @@ public class StartViewModelFactory implements ViewModelProvider.Factory  {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(StartViewModel.class)) {
-            return (T) new StartViewModel(AccountsRepository.getInstance(RestaurantClient.getInstance().getAccountService()));
+            return (T) new StartViewModel(
+                    new AuthenticationService(
+                            RestaurantClient.getInstance().getAuthenticateService(),
+                            RestaurantClient.getInstance().getAuthenticateInfoService()
+                    ));
         } else {
             throw new IllegalArgumentException("Unknown ViewModel class");
         }

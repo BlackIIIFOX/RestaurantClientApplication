@@ -9,11 +9,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:screenOrientation="landscape"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
+        android:theme="@style/Theme.AppCompat.Light">
         <activity
+            android:name=".ui.main.MainActivity"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:theme="@style/Theme.AppCompat.NoActionBar"
             android:name=".ui.login.LoginActivity"
             android:label="@string/title_activity_login" />
-        <activity android:name=".ui.start.StartActivity">
+        <activity android:name=".ui.start.StartActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

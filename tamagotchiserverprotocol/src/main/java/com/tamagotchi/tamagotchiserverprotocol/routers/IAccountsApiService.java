@@ -1,4 +1,4 @@
-package com.tamagotchi.tamagotchiserverprotocol;
+package com.tamagotchi.tamagotchiserverprotocol.routers;
 
 import com.tamagotchi.tamagotchiserverprotocol.models.AccountInfoModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
@@ -29,12 +29,4 @@ public interface IAccountsApiService {
      */
     @POST("accounts/create")
     Call<AccountInfoModel> createAccount(@Body SignInfoModel accountData);
-
-    /**
-     * Authenticate user.
-     * @param accountData account data with login and password.
-     * @return jwt token.
-     */
-    @POST("accounts/authenticate")
-    Call<AccountInfoModel> authenticate(@Body AccountInfoModel accountData);
 }
