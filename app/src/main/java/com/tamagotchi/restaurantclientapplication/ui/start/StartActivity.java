@@ -10,10 +10,12 @@ import android.widget.ProgressBar;
 
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.Result;
+import com.tamagotchi.restaurantclientapplication.services.AuthenticationInfoStorageService;
 import com.tamagotchi.restaurantclientapplication.services.BootstrapService;
 import com.tamagotchi.restaurantclientapplication.ui.BaseActivity;
 import com.tamagotchi.restaurantclientapplication.ui.login.LoginActivity;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainActivity;
+import com.tamagotchi.tamagotchiserverprotocol.services.AuthenticateInfoService;
 
 public class StartActivity extends BaseActivity {
 

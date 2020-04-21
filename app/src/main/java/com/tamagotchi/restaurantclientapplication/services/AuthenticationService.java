@@ -24,6 +24,7 @@ public class AuthenticationService {
     private MutableLiveData<Result> isAuth = new MutableLiveData<>();
     private IAuthenticateApiService authenticateApiService;
     private IAuthenticateInfoService authenticateInfoService;
+    private AuthenticationInfoStorageService storageService = new AuthenticationInfoStorageService();
 
     public LiveData<Result> isAuthenticated() {
         return isAuth;
@@ -59,7 +60,14 @@ public class AuthenticationService {
             public void onResponse(Call<AuthenticateInfoModel> call, Response<AuthenticateInfoModel> response) {
                 if (response.isSuccessful()) {
                     AuthenticateInfoModel authenticateInfoModel = response.body();
+
+                    if (authenticateInfoModel == null || authenticateInfoModel.getToken().isEmpty()) {
+                        isAuth.setValue(new Result.Error(new Exception("Server fault. Check the server.")));
+                        return;
+                    }
+
                     authenticateInfoService.LogIn(authenticateInfoModel);
+                    storageService.saveToken(authenticateInfoModel.getToken());
                     // TODO: сделать сохранение jwt локально
                     Result result = new Result.Success<Boolean>(true);
                     isAuth.setValue(result);
@@ -87,7 +95,13 @@ public class AuthenticationService {
     }
 
     public void checkAuthenticate() {
-        // TODO: нужно проверять локальное хранилище jwt
+
+        if (!authenticateInfoService.isAuthenticate()) {
+            String token = storageService.getToken();
+            if (!token.isEmpty()) {
+                authenticateInfoService.LogIn(new AuthenticateInfoModel(token));
+            }
+        }
 
         if (authenticateInfoService.isAuthenticate()) {
             isAuth.setValue(new Result.Success());

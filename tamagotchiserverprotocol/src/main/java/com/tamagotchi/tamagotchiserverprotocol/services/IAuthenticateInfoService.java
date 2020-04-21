@@ -20,4 +20,10 @@ public interface IAuthenticateInfoService {
      * Прекращает использовать данные аутентификации.
      */
     void LogOut();
+
+    /**
+     * Возвращает данные для аутентификации.
+     * @return данные аутентификации.
+     */
+    AuthenticateInfoModel getAuthenticateInfo();
 }

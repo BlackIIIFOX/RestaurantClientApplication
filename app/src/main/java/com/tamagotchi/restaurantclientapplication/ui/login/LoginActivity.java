@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tamagotchi.restaurantclientapplication.data.Result;
+import com.tamagotchi.restaurantclientapplication.services.AuthenticationInfoStorageService;
 import com.tamagotchi.restaurantclientapplication.ui.BaseActivity;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainActivity;
 import com.tamagotchi.restaurantclientapplication.ui.start.StartActivity;
