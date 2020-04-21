@@ -7,7 +7,7 @@ import androidx.annotation.Nullable;
  */
 class LoginResult {
     @Nullable
-    private LoggedInUserView success;
+    private Boolean success;
     @Nullable
     private Integer error;
 
@@ -15,12 +15,12 @@ class LoginResult {
         this.error = error;
     }
 
-    LoginResult(@Nullable LoggedInUserView success) {
-        this.success = success;
+    LoginResult() {
+        this.success = true;
     }
 
     @Nullable
-    LoggedInUserView getSuccess() {
+    Boolean getSuccess() {
         return success;
     }
 

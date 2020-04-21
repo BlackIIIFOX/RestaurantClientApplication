@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.restaurantclientapplication.ui.BaseActivity;
+import com.tamagotchi.restaurantclientapplication.ui.main.MainActivity;
 import com.tamagotchi.restaurantclientapplication.ui.start.StartActivity;
 import com.tamagotchi.restaurantclientapplication.R;
 
@@ -72,26 +73,6 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
-        loginViewModel.getLoginResult().observe(this, new Observer<LoginResult>() {
-            @Override
-            public void onChanged(@Nullable LoginResult loginResult) {
-                if (loginResult == null) {
-                    return;
-                }
-                loadingProgressBar.setVisibility(View.GONE);
-                if (loginResult.getError() != null) {
-                    showLoginFailed(loginResult.getError());
-                }
-                if (loginResult.getSuccess() != null) {
-                    updateUiWithUser(loginResult.getSuccess());
-                }
-                setResult(Activity.RESULT_OK);
-
-                //Complete and destroy login activity once successful
-                finish();
-            }
-        });
-
         TextWatcher afterTextChangedListener = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -112,16 +93,8 @@ public class LoginActivity extends BaseActivity {
         usernameEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
 
-        passwordEditText.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                loginViewModel.login(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
-            }
-
-            return false;
-        });
-
         loginButton.setOnClickListener(v -> {
+            loginButton.setVisibility(View.GONE);
             loadingProgressBar.setVisibility(View.VISIBLE);
 
             if (isNewAccount) {
@@ -133,15 +106,38 @@ public class LoginActivity extends BaseActivity {
                         passwordEditText.getText().toString());
             }
         });
-    }
 
-    private void updateUiWithUser(LoggedInUserView model) {
-        String welcome = getString(R.string.welcome) + model.getDisplayName();
-        // TODO : initiate successful logged in experience
-        Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
+        loginViewModel.getLoginResult().observe(this, loginResult -> {
+            if (loginResult == null) {
+                return;
+            }
+
+            loadingProgressBar.setVisibility(View.GONE);
+            loginButton.setVisibility(View.VISIBLE);
+
+            if (loginResult.getError() != null) {
+                showLoginFailed(loginResult.getError());
+                return;
+            }
+
+            if (isNewAccount) {
+                Intent activity2Intent = new Intent(getApplicationContext(), StartActivity.class);
+                startActivity(activity2Intent);
+                showMessage(R.string.create_success);
+                finish();
+            } else {
+                Intent activity2Intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(activity2Intent);
+                finish();
+            }
+        });
     }
 
     private void showLoginFailed(@StringRes Integer errorString) {
         Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
+    }
+
+    private void showMessage(@StringRes Integer message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 }

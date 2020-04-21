@@ -21,10 +21,7 @@ public class LoginViewModelFactory implements ViewModelProvider.Factory {
         if (modelClass.isAssignableFrom(LoginViewModel.class)) {
             return (T) new LoginViewModel(
                     AccountsRepository.getInstance(RestaurantClient.getInstance().getAccountService()),
-                    new AuthenticationService(
-                            RestaurantClient.getInstance().getAuthenticateService(),
-                            RestaurantClient.getInstance().getAuthenticateInfoService()
-                    )
+                    AuthenticationService.getInstance()
             );
         } else {
             throw new IllegalArgumentException("Unknown ViewModel class");

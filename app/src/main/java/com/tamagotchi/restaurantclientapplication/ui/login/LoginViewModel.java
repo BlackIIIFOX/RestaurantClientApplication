@@ -1,20 +1,23 @@
 package com.tamagotchi.restaurantclientapplication.ui.login;
 
+import android.util.Patterns;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
-import android.util.Patterns;
-
+import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.AccountsRepository;
 import com.tamagotchi.restaurantclientapplication.data.Result;
-import com.tamagotchi.restaurantclientapplication.data.model.LoggedInUser;
-import com.tamagotchi.restaurantclientapplication.R;
+import com.tamagotchi.restaurantclientapplication.data.exceptions.AccountExistException;
+import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthLoginException;
+import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthPasswordException;
 import com.tamagotchi.restaurantclientapplication.data.model.LoginInfo;
 import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
 import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
+
+import javax.security.auth.login.LoginException;
 
 public class LoginViewModel extends ViewModel {
 
@@ -41,11 +44,30 @@ public class LoginViewModel extends ViewModel {
         LoginInfo loginInfo = new LoginInfo(username, password);
         LiveData<Result> resultLiveData = authenticationService.authenticate(loginInfo);
 
+        // TODO: перейти на JavaRx, т.к. сервисы не могут общаться между собой через LiveData
         final Observer<Result> createdObserver = result -> {
+            if (result == null) {
+                return;
+            }
+
             if (result instanceof Result.Success) {
-                loginResult.setValue(new LoginResult(new LoggedInUserView("You")));
+                loginResult.setValue(new LoginResult());
             } else {
-                loginResult.setValue(new LoginResult(R.string.login_failed));
+                if (result instanceof Result.Error) {
+                    Exception error = ((Result.Error) result).getError();
+                    try {
+                        throw error;
+                    } catch (AuthLoginException e) {
+                        loginResult.setValue(new LoginResult(R.string.invalid_username));
+                    } catch (AuthPasswordException e) {
+                        loginResult.setValue(new LoginResult(R.string.auth_invalid_password));
+                    }
+                    catch (Exception e) {
+                        loginResult.setValue(new LoginResult(R.string.login_failed));
+                    }
+                } else {
+                    loginResult.setValue(new LoginResult(R.string.login_failed));
+                }
             }
         };
 
@@ -54,13 +76,31 @@ public class LoginViewModel extends ViewModel {
 
     public void create(String username, String password) {
 
-        LiveData<Result> resultLiveData = accountsRepository.createAccount(new SignInfoModel(username, password));
+        LoginInfo createInfo = new LoginInfo(username, password);
+
+        LiveData<Result> resultLiveData = accountsRepository.createAccount(createInfo);
 
         final Observer<Result> createdObserver = result -> {
+            if (result == null) {
+                return;
+            }
+
             if (result instanceof Result.Success) {
-                loginResult.setValue(new LoginResult(new LoggedInUserView("You")));
+                loginResult.setValue(new LoginResult());
             } else {
-                loginResult.setValue(new LoginResult(R.string.login_failed));
+                if (result instanceof Result.Error) {
+                    Exception error = ((Result.Error) result).getError();
+                    try {
+                        throw error;
+                    } catch (AccountExistException e) {
+                        loginResult.setValue(new LoginResult(R.string.account_already_exist));
+                    }
+                    catch (Exception e) {
+                        loginResult.setValue(new LoginResult(R.string.create_account_error));
+                    }
+                } else {
+                    loginResult.setValue(new LoginResult(R.string.create_account_error));
+                }
             }
         };
 

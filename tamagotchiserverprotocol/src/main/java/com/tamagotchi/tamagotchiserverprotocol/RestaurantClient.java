@@ -9,6 +9,7 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 
 import java.io.IOException;
@@ -25,29 +26,29 @@ public class RestaurantClient {
     private String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6Ik1hbmFnZXIiLCJpYXQiOjE1ODY5NzEyNTV9.lasbKegsStSGla3JY3dsIJLmQ2PriyGDh9kA8xA9Jds";
 
     private IAccountsApiService accountsService;
-    IAuthenticateApiService authenticateService;
+    private IAuthenticateApiService authenticateService;
     private AuthenticateInfoService authenticateInfoService = new AuthenticateInfoService();
 
     /**
      * Инициализация retrofit клиента.
      */
     private RestaurantClient() {
+        HttpLoggingInterceptor logger = new HttpLoggingInterceptor();
+        logger.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
+
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
-                .addInterceptor(new Interceptor() {
-                    @Override
-                    public Response intercept(Chain chain) throws IOException {
-
-                        // Добавляем JWT токен в запрос для аутентификации.
-                        Request.Builder newRequest = chain.request().newBuilder();
-                        if (authenticateInfoService.isAuthenticate()) {
-                            newRequest.addHeader("Authorization", "Bearer " + token);
-                        }
-
-                        return chain.proceed(newRequest.build());
+                .addInterceptor(chain -> {
+                    // Добавляем JWT токен в запрос для аутентификации.
+                    Request.Builder newRequest = chain.request().newBuilder();
+                    if (authenticateInfoService.isAuthenticate()) {
+                        newRequest.addHeader("Authorization", "Bearer " + token);
                     }
+
+                    return chain.proceed(newRequest.build());
                 })
+                .addInterceptor(logger)
                 .build();
 
         // TODO: что то нужно сделать с жестко заданным URL.

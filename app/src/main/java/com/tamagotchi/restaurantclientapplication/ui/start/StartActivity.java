@@ -10,13 +10,13 @@ import android.widget.ProgressBar;
 
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.Result;
+import com.tamagotchi.restaurantclientapplication.services.BootstrapService;
 import com.tamagotchi.restaurantclientapplication.ui.BaseActivity;
 import com.tamagotchi.restaurantclientapplication.ui.login.LoginActivity;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainActivity;
 
 public class StartActivity extends BaseActivity {
 
-    static final int LOGIN_REQUEST = 1; // The request code.
     private StartViewModel viewModel;
     private ProgressBar loading;
     private Button buttonCreate;
@@ -25,10 +25,9 @@ public class StartActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+        BootstrapService.getInstance().InitializeApplication();
 
-        //mainViewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
-        //mainViewModel.StartServices();
+        setContentView(R.layout.activity_start);
 
         viewModel = new ViewModelProvider(this, new StartViewModelFactory()).get(StartViewModel.class);
 
@@ -39,14 +38,11 @@ public class StartActivity extends BaseActivity {
         showProgressBarAndHideAuthButtons();
 
         buttonLogin.setOnClickListener(v -> {
-            Intent activity2Intent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivityForResult(activity2Intent, LOGIN_REQUEST);
+            showLoginActivity(false);
         });
 
         buttonCreate.setOnClickListener(v -> {
-            Intent activity2Intent = new Intent(getApplicationContext(), LoginActivity.class);
-            activity2Intent.putExtra("isNewAccount", true);
-            startActivityForResult(activity2Intent, LOGIN_REQUEST);
+            showLoginActivity(true);
         });
 
         viewModel.isAuthenticated().observe(this, isAuthState -> {
@@ -58,6 +54,7 @@ public class StartActivity extends BaseActivity {
                 // Открываем главное окно
                 Intent activity2Intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(activity2Intent);
+                finish();
             } else {
                 showAuthButtonsAndHideProgressBar();
             }
@@ -66,8 +63,14 @@ public class StartActivity extends BaseActivity {
         viewModel.refreshAuthenticated();
     }
 
-    private void updateLoginView() {
-
+    public void showLoginActivity(boolean isNewAccount) {
+        Intent activity2Intent = new Intent(getApplicationContext(), LoginActivity.class);
+        if (isNewAccount) {
+            activity2Intent.putExtra("isNewAccount", true);
+        }
+        startActivity(activity2Intent);
+        viewModel.isAuthenticated().removeObservers(this);
+        finish();
     }
 
     private void showAuthButtonsAndHideProgressBar() {
@@ -80,23 +83,6 @@ public class StartActivity extends BaseActivity {
         buttonLogin.setVisibility(View.GONE);
         buttonCreate.setVisibility(View.GONE);
         loading.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == LOGIN_REQUEST) {
-            // Make sure the request was successful
-            showProgressBarAndHideAuthButtons();
-            viewModel.refreshAuthenticated();
-            if (resultCode == RESULT_OK) {
-                // The user picked a contact.
-                // The Intent's data Uri identifies which contact was selected.
-
-                // Do something with the contact here (bigger example below)
-            }
-        }
     }
 
     @Override

@@ -14,10 +14,7 @@ public class StartViewModelFactory implements ViewModelProvider.Factory  {
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(StartViewModel.class)) {
             return (T) new StartViewModel(
-                    new AuthenticationService(
-                            RestaurantClient.getInstance().getAuthenticateService(),
-                            RestaurantClient.getInstance().getAuthenticateInfoService()
-                    ));
+                    AuthenticationService.getInstance());
         } else {
             throw new IllegalArgumentException("Unknown ViewModel class");
         }
