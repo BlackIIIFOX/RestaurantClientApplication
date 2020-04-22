@@ -5,15 +5,13 @@ import com.tamagotchi.tamagotchiserverprotocol.routers.IAuthenticateApiService;
 import com.tamagotchi.tamagotchiserverprotocol.services.AuthenticateInfoService;
 import com.tamagotchi.tamagotchiserverprotocol.services.IAuthenticateInfoService;
 
-import okhttp3.Interceptor;
+import java.util.concurrent.TimeUnit;
+
+import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
@@ -58,6 +56,7 @@ public class RestaurantClient {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .client(client)
                 .build();
 
@@ -76,6 +75,7 @@ public class RestaurantClient {
 
     /**
      * Предоставляет сервис для работы с пользователями системы.
+     *
      * @return /api/user service
      */
     public IAccountsApiService getAccountService() {
@@ -84,15 +84,19 @@ public class RestaurantClient {
 
     /**
      * Предоставляет сервис для работы с авторизацией системы.
+     *
      * @return /api/authenticate service
      */
-    public IAuthenticateApiService getAuthenticateService() { return authenticateService; }
+    public IAuthenticateApiService getAuthenticateService() {
+        return authenticateService;
+    }
 
     /**
      * Предоставляет сервис для работы с данными авторизации.
      * Большенство запросов не будут работать без их установки.
      * Для получения данных аутентификации используйте {@linkplain IAccountsApiService
      * AccountsApiService}
+     *
      * @return /api/user service
      */
     public IAuthenticateInfoService getAuthenticateInfoService() {

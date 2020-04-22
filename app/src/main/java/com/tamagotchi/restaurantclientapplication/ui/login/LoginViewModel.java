@@ -43,8 +43,7 @@ public class LoginViewModel extends ViewModel {
 
         LoginInfo loginInfo = new LoginInfo(username, password);
         LiveData<Result> resultLiveData = authenticationService.authenticate(loginInfo);
-
-        // TODO: перейти на JavaRx, т.к. сервисы не могут общаться между собой через LiveData
+        
         final Observer<Result> createdObserver = result -> {
             if (result == null) {
                 return;

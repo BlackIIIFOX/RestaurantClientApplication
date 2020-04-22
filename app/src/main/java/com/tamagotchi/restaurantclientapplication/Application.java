@@ -13,7 +13,7 @@ public class Application extends android.app.Application {
 
         mApp = this;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //mPrefs.edit().remove("token").apply();
+        mPrefs.edit().remove("token").apply();
     }
 
     public static Application get() {

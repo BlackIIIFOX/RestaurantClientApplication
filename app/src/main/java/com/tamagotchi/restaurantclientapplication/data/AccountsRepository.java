@@ -9,8 +9,14 @@ import com.tamagotchi.tamagotchiserverprotocol.routers.IAccountsApiService;
 import com.tamagotchi.tamagotchiserverprotocol.models.AccountInfoModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.observers.DisposableSingleObserver;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.HttpException;
 import retrofit2.Response;
 
 public class AccountsRepository {
@@ -44,26 +50,23 @@ public class AccountsRepository {
                 loginInfo.getPassword().getPasswordMd5());
 
         MutableLiveData<Result> newAccountLivaData = new MutableLiveData<>();
-        accountsApiService.createAccount(signUpInfo).enqueue(new Callback<AccountInfoModel>() {
-            @Override
-            public void onResponse(Call<AccountInfoModel> call, Response<AccountInfoModel> response) {
-                if (response.isSuccessful()) {
-                    newAccountLivaData.setValue(new Result.Success());
-                } else {
-                    if (response.code() == 403) {
-                        newAccountLivaData.setValue(new Result.Error(new AccountExistException()));
-                    } else {
-                        newAccountLivaData.setValue(new Result.Error(new Exception("Unhandled error code")));
-                    }
-                }
-            }
 
-            @Override
-            public void onFailure(Call<AccountInfoModel> call, Throwable t) {
-                // TODO
-                newAccountLivaData.setValue(new Result.Error(new AccountExistException()));
-            }
-        });
+        accountsApiService.createAccount(signUpInfo)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> newAccountLivaData.setValue(new Result.Success()), error -> {
+                    if (error instanceof HttpException) {
+                        HttpException httpError = (HttpException) error;
+
+                        if (httpError.code() == 403) {
+                            newAccountLivaData.setValue(new Result.Error(new AccountExistException()));
+                        } else {
+                            newAccountLivaData.setValue(new Result.Error(new Exception(error)));
+                        }
+                    } else {
+                        newAccountLivaData.setValue(new Result.Error(new Exception(error)));
+                    }
+                });
 
         return newAccountLivaData;
     }

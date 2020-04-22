@@ -12,8 +12,12 @@ import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAuthenticateApiService;
 import com.tamagotchi.tamagotchiserverprotocol.services.IAuthenticateInfoService;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.HttpException;
 import retrofit2.Response;
 
 public class AuthenticationService {
@@ -55,41 +59,42 @@ public class AuthenticationService {
         isAuth.setValue(null);
         authenticateInfoService.LogOut();
 
-        this.authenticateApiService.authenticate(loginInfoModel).enqueue(new Callback<AuthenticateInfoModel>() {
-            @Override
-            public void onResponse(Call<AuthenticateInfoModel> call, Response<AuthenticateInfoModel> response) {
-                if (response.isSuccessful()) {
-                    AuthenticateInfoModel authenticateInfoModel = response.body();
+        this.authenticateApiService.authenticate(loginInfoModel)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        result -> {
+                            // Если сервер не вернул jwt, но запрос был успешен, то нажуно проверять сервер.
+                            if (result.getToken().isEmpty()) {
+                                isAuth.setValue(new Result.Error(new Exception("Server fault. Check the server.")));
+                                return;
+                            }
 
-                    if (authenticateInfoModel == null || authenticateInfoModel.getToken().isEmpty()) {
-                        isAuth.setValue(new Result.Error(new Exception("Server fault. Check the server.")));
-                        return;
-                    }
+                            // Сохраяем jwt и авторизируемся
+                            authenticateInfoService.LogIn(result);
+                            storageService.saveToken(result.getToken());
 
-                    authenticateInfoService.LogIn(authenticateInfoModel);
-                    storageService.saveToken(authenticateInfoModel.getToken());
-                    // TODO: сделать сохранение jwt локально
-                    Result result = new Result.Success<Boolean>(true);
-                    isAuth.setValue(result);
-                } else {
-                    switch (response.code()) {
-                        case 401:
-                            isAuth.setValue(new Result.Error(new AuthPasswordException()));
-                            break;
-                        case 404:
-                            isAuth.setValue(new Result.Error(new AuthLoginException()));
-                            break;
-                        default:
-                            isAuth.setValue(new Result.Error(new Exception("Exception not handled")));
-                    }
-                }
-            }
+                            Result next = new Result.Success<>(true);
+                            isAuth.setValue(next);
+                        },
+                        error -> {
+                            if (error instanceof HttpException) {
+                                HttpException httpError = (HttpException) error;
 
-            @Override
-            public void onFailure(Call<AuthenticateInfoModel> call, Throwable t) {
-                isAuth.setValue(new Result.Error(new Exception(t)));
-            }
-        });
+                                switch (httpError.code()) {
+                                    case 401:
+                                        isAuth.setValue(new Result.Error(new AuthPasswordException()));
+                                        break;
+                                    case 404:
+                                        isAuth.setValue(new Result.Error(new AuthLoginException()));
+                                        break;
+                                    default:
+                                        isAuth.setValue(new Result.Error(new Exception("Exception not handled")));
+                                }
+                            } else {
+                                isAuth.setValue(new Result.Error(new Exception(error)));
+                            }
+                        });
 
         return isAuth;
     }

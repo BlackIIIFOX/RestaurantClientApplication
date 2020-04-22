@@ -5,7 +5,8 @@ import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
 
 import java.util.List;
 
-import retrofit2.Call;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Single;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -21,10 +22,10 @@ public interface IAccountsApiService {
      * @return collections accounts.
      */
     @GET("accounts/")
-    Call<List<AccountInfoModel>> getAccounts();
+    Single<List<AccountInfoModel>> getAccounts();
 
     @GET("accounts/{id}")
-    Call<AccountInfoModel> getAccount(@Path("uid") int id);
+    Single<AccountInfoModel> getAccount(@Path("uid") int id);
 
     /**
      * Create user.
@@ -32,5 +33,5 @@ public interface IAccountsApiService {
      * @return new user id.
      */
     @POST("accounts/")
-    Call<AccountInfoModel> createAccount(@Body SignInfoModel accountData);
+    Completable createAccount(@Body SignInfoModel accountData);
 }
