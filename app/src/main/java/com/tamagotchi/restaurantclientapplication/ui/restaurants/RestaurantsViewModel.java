@@ -1,16 +1,15 @@
-package com.tamagotchi.restaurantclientapplication.ui.dashboard;
+package com.tamagotchi.restaurantclientapplication.ui.restaurants;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class DashboardViewModel extends ViewModel {
-
+public class RestaurantsViewModel extends ViewModel {
     private MutableLiveData<String> mText;
 
-    public DashboardViewModel() {
+    public RestaurantsViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is dashboard fragment");
+        mText.setValue("This is restaurants fragment");
     }
 
     public LiveData<String> getText() {

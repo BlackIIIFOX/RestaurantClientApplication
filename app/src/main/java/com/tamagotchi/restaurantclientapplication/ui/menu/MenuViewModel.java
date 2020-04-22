@@ -1,16 +1,16 @@
-package com.tamagotchi.restaurantclientapplication.ui.home;
+package com.tamagotchi.restaurantclientapplication.ui.menu;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class HomeViewModel extends ViewModel {
+public class MenuViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public HomeViewModel() {
+    public MenuViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+        mText.setValue("This is menu fragment");
     }
 
     public LiveData<String> getText() {
