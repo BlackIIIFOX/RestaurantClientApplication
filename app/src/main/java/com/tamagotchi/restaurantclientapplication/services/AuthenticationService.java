@@ -13,8 +13,16 @@ import com.tamagotchi.tamagotchiserverprotocol.routers.IAuthenticateApiService;
 import com.tamagotchi.tamagotchiserverprotocol.services.IAuthenticateInfoService;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.CompletableEmitter;
+import io.reactivex.rxjava3.core.CompletableOnSubscribe;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.HttpException;
@@ -25,18 +33,23 @@ public class AuthenticationService {
     private static final Object syncInstance = new Object();
     private static AuthenticationService instance;
 
-    private MutableLiveData<Result> isAuth = new MutableLiveData<>();
     private IAuthenticateApiService authenticateApiService;
     private IAuthenticateInfoService authenticateInfoService;
     private AuthenticationInfoStorageService storageService = new AuthenticationInfoStorageService();
+    private Observable<Boolean> isAuthenticatedSource;
+    private BehaviorSubject<Boolean> isAuthenticatedSourceSubject;
 
-    public LiveData<Result> isAuthenticated() {
-        return isAuth;
+    public Observable<Boolean> isAuthenticated() {
+        return isAuthenticatedSource;
     }
 
     private AuthenticationService(IAuthenticateApiService authenticateApiService, IAuthenticateInfoService authenticateInfoService) {
         this.authenticateApiService = authenticateApiService;
         this.authenticateInfoService = authenticateInfoService;
+
+        isAuthenticatedSourceSubject = BehaviorSubject.create();
+        isAuthenticatedSource = isAuthenticatedSourceSubject;
+        this.loadAuthenticate();
     }
 
     public static AuthenticationService getInstance() {
@@ -51,55 +64,60 @@ public class AuthenticationService {
         }
     }
 
-    public LiveData<Result> authenticate(LoginInfo loginInfo) {
+    public void signOut() {
+        storageService.removeToken();
+        isAuthenticatedSourceSubject.onNext(false);
+
+    }
+
+    public Completable signIn(LoginInfo loginInfo) {
         SignInfoModel loginInfoModel = new SignInfoModel(loginInfo.getLogin(),
                 loginInfo.getPassword().getPasswordMd5());
 
         // Сбрасываем предыдущее значение, т.к. оно вернеться подписчикам.
-        isAuth.setValue(null);
         authenticateInfoService.LogOut();
 
-        this.authenticateApiService.authenticate(loginInfoModel)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        result -> {
-                            // Если сервер не вернул jwt, но запрос был успешен, то нажуно проверять сервер.
-                            if (result.getToken().isEmpty()) {
-                                isAuth.setValue(new Result.Error(new Exception("Server fault. Check the server.")));
-                                return;
-                            }
-
-                            // Сохраяем jwt и авторизируемся
-                            authenticateInfoService.LogIn(result);
-                            storageService.saveToken(result.getToken());
-
-                            Result next = new Result.Success<>(true);
-                            isAuth.setValue(next);
-                        },
-                        error -> {
-                            if (error instanceof HttpException) {
-                                HttpException httpError = (HttpException) error;
-
-                                switch (httpError.code()) {
-                                    case 401:
-                                        isAuth.setValue(new Result.Error(new AuthPasswordException()));
-                                        break;
-                                    case 404:
-                                        isAuth.setValue(new Result.Error(new AuthLoginException()));
-                                        break;
-                                    default:
-                                        isAuth.setValue(new Result.Error(new Exception("Exception not handled")));
+        return Completable.create(source -> {
+            this.authenticateApiService.authenticate(loginInfoModel)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            accountAuthData -> {
+                                // Если сервер не вернул jwt, но запрос был успешен, то нажуно проверять сервер.
+                                if (accountAuthData.getToken().isEmpty()) {
+                                    source.onError(new Exception("Server fault. Check the server."));
+                                    return;
                                 }
-                            } else {
-                                isAuth.setValue(new Result.Error(new Exception(error)));
-                            }
-                        });
 
-        return isAuth;
+                                // Сохраяем jwt и авторизируемся
+                                authenticateInfoService.LogIn(accountAuthData);
+                                storageService.saveToken(accountAuthData.getToken());
+                                isAuthenticatedSourceSubject.onNext(true);
+
+                                source.onComplete();
+                            },
+                            error -> {
+                                if (error instanceof HttpException) {
+                                    HttpException httpError = (HttpException) error;
+
+                                    switch (httpError.code()) {
+                                        case 401:
+                                            source.onError(new AuthPasswordException());
+                                            break;
+                                        case 404:
+                                            source.onError(new AuthLoginException());
+                                            break;
+                                        default:
+                                            source.onError(new Exception(error));
+                                    }
+                                } else {
+                                    source.onError(new Exception(error));
+                                }
+                            });
+        });
     }
 
-    public void checkAuthenticate() {
+    private void loadAuthenticate() {
 
         if (!authenticateInfoService.isAuthenticate()) {
             String token = storageService.getToken();
@@ -109,9 +127,9 @@ public class AuthenticationService {
         }
 
         if (authenticateInfoService.isAuthenticate()) {
-            isAuth.setValue(new Result.Success());
+            isAuthenticatedSourceSubject.onNext(true);
         } else {
-            isAuth.setValue(new Result.Error(new Exception()));
+            isAuthenticatedSourceSubject.onError(new AuthLoginException());
         }
     }
 

@@ -11,6 +11,10 @@ import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -39,7 +43,7 @@ public class AccountsRepository {
         return instance;
     }
 
-    public LiveData<Result> createAccount(LoginInfo loginInfo) {
+    public Completable createAccount(LoginInfo loginInfo) {
 
         if (loginInfo.getLogin().isEmpty() ||
                 loginInfo.getPassword() == null || loginInfo.getPassword().getPasswordMd5().isEmpty()) {
@@ -49,26 +53,24 @@ public class AccountsRepository {
         SignInfoModel signUpInfo = new SignInfoModel(loginInfo.getLogin(),
                 loginInfo.getPassword().getPasswordMd5());
 
-        MutableLiveData<Result> newAccountLivaData = new MutableLiveData<>();
+        return Completable.create(source -> {
+            accountsApiService.createAccount(signUpInfo)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(source::onComplete, error -> {
+                        if (error instanceof HttpException) {
+                            HttpException httpError = (HttpException) error;
 
-        accountsApiService.createAccount(signUpInfo)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> newAccountLivaData.setValue(new Result.Success()), error -> {
-                    if (error instanceof HttpException) {
-                        HttpException httpError = (HttpException) error;
-
-                        if (httpError.code() == 403) {
-                            newAccountLivaData.setValue(new Result.Error(new AccountExistException()));
+                            if (httpError.code() == 403) {
+                                source.onError(new AccountExistException());
+                            } else {
+                                source.onError(new Exception(error));
+                            }
                         } else {
-                            newAccountLivaData.setValue(new Result.Error(new Exception(error)));
+                            source.onError(new Exception(error));
                         }
-                    } else {
-                        newAccountLivaData.setValue(new Result.Error(new Exception(error)));
-                    }
-                });
-
-        return newAccountLivaData;
+                    });
+        });
     }
 
     private LiveData<AccountInfoModel> getCurrantAccount() {

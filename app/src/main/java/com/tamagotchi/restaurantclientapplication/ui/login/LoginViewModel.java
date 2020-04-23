@@ -15,9 +15,6 @@ import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthLoginExcep
 import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthPasswordException;
 import com.tamagotchi.restaurantclientapplication.data.model.LoginInfo;
 import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
-import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
-
-import javax.security.auth.login.LoginException;
 
 public class LoginViewModel extends ViewModel {
 
@@ -42,68 +39,35 @@ public class LoginViewModel extends ViewModel {
     public void login(String username, String password) {
 
         LoginInfo loginInfo = new LoginInfo(username, password);
-        LiveData<Result> resultLiveData = authenticationService.authenticate(loginInfo);
-        
-        final Observer<Result> createdObserver = result -> {
-            if (result == null) {
-                return;
-            }
-
-            if (result instanceof Result.Success) {
-                loginResult.setValue(new LoginResult());
-            } else {
-                if (result instanceof Result.Error) {
-                    Exception error = ((Result.Error) result).getError();
-                    try {
-                        throw error;
-                    } catch (AuthLoginException e) {
+        authenticationService.signIn(loginInfo).subscribe(
+                () -> loginResult.setValue(new LoginResult()),
+                error -> {
+                    if (error instanceof AuthLoginException) {
                         loginResult.setValue(new LoginResult(R.string.invalid_username));
-                    } catch (AuthPasswordException e) {
+                    } else if (error instanceof AuthPasswordException) {
                         loginResult.setValue(new LoginResult(R.string.auth_invalid_password));
-                    }
-                    catch (Exception e) {
+                    } else {
                         loginResult.setValue(new LoginResult(R.string.login_failed));
                     }
-                } else {
-                    loginResult.setValue(new LoginResult(R.string.login_failed));
                 }
-            }
-        };
-
-        resultLiveData.observeForever(createdObserver);
+        );
     }
 
     public void create(String username, String password) {
 
         LoginInfo createInfo = new LoginInfo(username, password);
 
-        LiveData<Result> resultLiveData = accountsRepository.createAccount(createInfo);
-
-        final Observer<Result> createdObserver = result -> {
-            if (result == null) {
-                return;
-            }
-
-            if (result instanceof Result.Success) {
-                loginResult.setValue(new LoginResult());
-            } else {
-                if (result instanceof Result.Error) {
-                    Exception error = ((Result.Error) result).getError();
-                    try {
-                        throw error;
-                    } catch (AccountExistException e) {
+        //LiveData<Result> resultLiveData = accountsRepository.createAccount(createInfo);
+        accountsRepository.createAccount(createInfo).subscribe(
+                () -> loginResult.setValue(new LoginResult()),
+                error -> {
+                    if (error instanceof AccountExistException) {
                         loginResult.setValue(new LoginResult(R.string.account_already_exist));
-                    }
-                    catch (Exception e) {
+                    } else {
                         loginResult.setValue(new LoginResult(R.string.create_account_error));
                     }
-                } else {
-                    loginResult.setValue(new LoginResult(R.string.create_account_error));
                 }
-            }
-        };
-
-        resultLiveData.observeForever(createdObserver);
+        );
     }
 
     public void loginDataChanged(String username, String password) {

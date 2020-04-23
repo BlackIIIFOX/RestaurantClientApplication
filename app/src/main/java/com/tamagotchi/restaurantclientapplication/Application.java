@@ -3,6 +3,9 @@ package com.tamagotchi.restaurantclientapplication;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
+import com.tamagotchi.restaurantclientapplication.services.BootstrapService;
+
 public class Application extends android.app.Application {
     private SharedPreferences mPrefs;
     private static Application mApp;
@@ -13,7 +16,8 @@ public class Application extends android.app.Application {
 
         mApp = this;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mPrefs.edit().remove("token").apply();
+        BootstrapService.getInstance().InitializeApplication();
+        //AuthenticationService.getInstance().signOut();
     }
 
     public static Application get() {

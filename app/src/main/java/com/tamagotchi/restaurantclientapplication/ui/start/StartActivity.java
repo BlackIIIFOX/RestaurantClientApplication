@@ -27,7 +27,6 @@ public class StartActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        BootstrapService.getInstance().InitializeApplication();
 
         setContentView(R.layout.activity_start);
 
@@ -61,8 +60,6 @@ public class StartActivity extends BaseActivity {
                 showAuthButtonsAndHideProgressBar();
             }
         });
-
-        viewModel.refreshAuthenticated();
     }
 
     public void showLoginActivity(boolean isNewAccount) {
