@@ -20,7 +20,7 @@ public class LoginViewModelFactory implements ViewModelProvider.Factory {
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(LoginViewModel.class)) {
             return (T) new LoginViewModel(
-                    AccountsRepository.getInstance(RestaurantClient.getInstance().getAccountService()),
+                    AccountsRepository.getInstance(),
                     AuthenticationService.getInstance()
             );
         } else {

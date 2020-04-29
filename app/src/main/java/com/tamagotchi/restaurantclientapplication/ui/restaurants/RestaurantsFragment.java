@@ -20,6 +20,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.tamagotchi.restaurantclientapplication.R;
+import com.tamagotchi.restaurantclientapplication.data.Result;
+import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
+
+import java.util.List;
 
 public class RestaurantsFragment extends Fragment implements OnMapReadyCallback {
 
@@ -36,13 +40,13 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback 
 
         mapInitialize();
 
-
         restaurantsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
             }
         });
+
         return root;
     }
 
@@ -65,9 +69,28 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback 
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        UpdateMap();
+    }
+
+    private void UpdateMap() {
+        restaurantsViewModel.getRestaurants().observe(getViewLifecycleOwner(), result ->
+        {
+            if (result instanceof Result.Success) {
+                List<RestaurantModel> restaurants = (List<RestaurantModel>)((Result.Success) result).getData();
+
+                LatLng restaurantPos = new LatLng(59.9386300, 30.3141300);
+                for (int i = 0; i < restaurants.size(); i++) {
+                    RestaurantModel restaurant = restaurants.get(i);
+
+                    // Add a marker in Sydney and move the camera
+                    restaurantPos = new LatLng(restaurant.getPositionLatitude(), restaurant.getPositionLongitude());
+                    mMap.addMarker(new MarkerOptions().position(restaurantPos).title(restaurant.getAddress()));
+                }
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(restaurantPos, 15));
+            } else {
+                // TODO: обработка ошибки
+            }
+        });
     }
 }

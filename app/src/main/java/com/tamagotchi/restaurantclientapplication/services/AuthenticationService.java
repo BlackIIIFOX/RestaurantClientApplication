@@ -36,6 +36,7 @@ public class AuthenticationService {
     private IAuthenticateApiService authenticateApiService;
     private IAuthenticateInfoService authenticateInfoService;
     private AuthenticationInfoStorageService storageService = new AuthenticationInfoStorageService();
+
     private Observable<Boolean> isAuthenticatedSource;
     private BehaviorSubject<Boolean> isAuthenticatedSourceSubject;
 
@@ -48,7 +49,7 @@ public class AuthenticationService {
         this.authenticateInfoService = authenticateInfoService;
 
         isAuthenticatedSourceSubject = BehaviorSubject.create();
-        isAuthenticatedSource = isAuthenticatedSourceSubject;
+        isAuthenticatedSource = isAuthenticatedSourceSubject.hide();
         this.loadAuthenticate();
     }
 

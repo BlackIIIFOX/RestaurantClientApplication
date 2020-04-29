@@ -29,18 +29,23 @@ public class AccountsRepository {
 
     private IAccountsApiService accountsApiService;
     private AccountsDAO accountsDAO;
+    private static final Object syncInstance = new Object();
 
     // private constructor : singleton access
     private AccountsRepository(IAccountsApiService accountsApiService) {
         this.accountsApiService = accountsApiService;
     }
 
-    public synchronized static AccountsRepository getInstance(IAccountsApiService accountsApiService) {
-        if (instance == null) {
+    public static AccountsRepository getInstance() {
+        synchronized (syncInstance) {
+            return instance;
+        }
+    }
+
+    public static void InitializeService(IAccountsApiService accountsApiService) {
+        synchronized (syncInstance) {
             instance = new AccountsRepository(accountsApiService);
         }
-
-        return instance;
     }
 
     public Completable createAccount(LoginInfo loginInfo) {

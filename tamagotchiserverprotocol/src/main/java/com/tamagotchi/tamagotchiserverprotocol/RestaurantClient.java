@@ -2,6 +2,7 @@ package com.tamagotchi.tamagotchiserverprotocol;
 
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAccountsApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAuthenticateApiService;
+import com.tamagotchi.tamagotchiserverprotocol.routers.IRestaurantsApiService;
 import com.tamagotchi.tamagotchiserverprotocol.services.AuthenticateInfoService;
 import com.tamagotchi.tamagotchiserverprotocol.services.IAuthenticateInfoService;
 
@@ -19,13 +20,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RestaurantClient {
     private static RestaurantClient instance = null;
+
     private Retrofit retrofit;
     private OkHttpClient client;
     private String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6Ik1hbmFnZXIiLCJpYXQiOjE1ODY5NzEyNTV9.lasbKegsStSGla3JY3dsIJLmQ2PriyGDh9kA8xA9Jds";
 
     private IAccountsApiService accountsService;
-    private IAuthenticateApiService authenticateService;
-    private AuthenticateInfoService authenticateInfoService = new AuthenticateInfoService();
+    private final AuthenticateInfoService authenticateInfoService = new AuthenticateInfoService();
+    private final IAuthenticateApiService authenticateService;
+    private final IRestaurantsApiService restaurantsService;
 
     /**
      * Инициализация retrofit клиента.
@@ -63,6 +66,7 @@ public class RestaurantClient {
         // Инициализируем маршрутизаторы retrofit
         accountsService = retrofit.create(IAccountsApiService.class);
         authenticateService = retrofit.create(IAuthenticateApiService.class);
+        restaurantsService = retrofit.create(IRestaurantsApiService.class);
     }
 
     public synchronized static RestaurantClient getInstance() {
@@ -103,5 +107,9 @@ public class RestaurantClient {
         return authenticateInfoService;
     }
 
-
+    /**
+     * Предоставляет сервис для работы с ресторанми.
+     * @return /api/restaurants service
+     */
+    public IRestaurantsApiService getRestaurantsService() { return restaurantsService; }
 }
