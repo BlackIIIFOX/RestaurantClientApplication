@@ -38,6 +38,10 @@ public class RestaurantModel {
     @Expose
     private Boolean isWifiPresent;
 
+    @SerializedName("isDeleted")
+    @Expose
+    private Boolean isDeleted;
+
     public Integer getId() {
         return id;
     }
@@ -100,5 +104,13 @@ public class RestaurantModel {
 
     public void setWifiPresent(Boolean wifiPresent) {
         isWifiPresent = wifiPresent;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }

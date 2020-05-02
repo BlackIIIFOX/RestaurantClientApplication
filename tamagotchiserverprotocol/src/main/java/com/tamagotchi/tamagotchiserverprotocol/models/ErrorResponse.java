@@ -5,21 +5,9 @@ import com.google.gson.annotations.SerializedName;
 
 public class ErrorResponse {
 
-    @SerializedName("code")
-    @Expose
-    private int code;
-
     @SerializedName("message")
     @Expose
     private String message;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
 
     public String getMessage() {
         return message;

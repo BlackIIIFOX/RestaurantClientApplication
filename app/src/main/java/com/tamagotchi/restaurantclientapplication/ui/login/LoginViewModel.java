@@ -4,12 +4,10 @@ import android.util.Patterns;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.tamagotchi.restaurantclientapplication.R;
-import com.tamagotchi.restaurantclientapplication.data.AccountsRepository;
-import com.tamagotchi.restaurantclientapplication.data.Result;
+import com.tamagotchi.restaurantclientapplication.data.repositories.UsersRepository;
 import com.tamagotchi.restaurantclientapplication.data.exceptions.AccountExistException;
 import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthLoginException;
 import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthPasswordException;
@@ -20,10 +18,10 @@ public class LoginViewModel extends ViewModel {
 
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
-    private AccountsRepository accountsRepository;
+    private UsersRepository accountsRepository;
     private AuthenticationService authenticationService;
 
-    LoginViewModel(AccountsRepository accountsRepository, AuthenticationService authenticationService) {
+    LoginViewModel(UsersRepository accountsRepository, AuthenticationService authenticationService) {
         this.accountsRepository = accountsRepository;
         this.authenticationService = authenticationService;
     }

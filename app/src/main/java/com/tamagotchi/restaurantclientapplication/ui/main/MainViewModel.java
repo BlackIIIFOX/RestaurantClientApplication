@@ -2,8 +2,6 @@ package com.tamagotchi.restaurantclientapplication.ui.main;
 
 import androidx.lifecycle.ViewModel;
 
-import com.tamagotchi.restaurantclientapplication.data.AccountsRepository;
-
 public class MainViewModel extends ViewModel {
     public void StartServices() {
         //AccountsRepository login = AccountsRepository.getInstance();

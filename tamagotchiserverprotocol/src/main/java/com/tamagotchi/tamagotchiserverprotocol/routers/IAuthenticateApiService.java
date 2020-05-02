@@ -1,7 +1,8 @@
 package com.tamagotchi.tamagotchiserverprotocol.routers;
 
 import com.tamagotchi.tamagotchiserverprotocol.models.AuthenticateInfoModel;
-import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
+import com.tamagotchi.tamagotchiserverprotocol.models.CredentialsModel;
+import com.tamagotchi.tamagotchiserverprotocol.models.enums.UserWithJwtModel;
 
 import io.reactivex.rxjava3.core.Single;
 import retrofit2.http.Body;
@@ -17,5 +18,5 @@ public interface IAuthenticateApiService {
      * @return jwt token.
      */
     @POST("authenticate")
-    Single<AuthenticateInfoModel> authenticate(@Body SignInfoModel accountData);
+    Single<UserWithJwtModel> authenticate(@Body CredentialsModel accountData);
 }
