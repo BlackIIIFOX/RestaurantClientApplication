@@ -70,7 +70,7 @@ public class RestaurantsRepository {
 
         return Single.fromObservable(Observable.fromArray(array));
 
-        // TODO: венуть
+        // TODO: вернуть
         /*return Single.create(source ->
                 this.restaurantsApiService.getAllRestaurants()
                         .subscribeOn(Schedulers.io())
