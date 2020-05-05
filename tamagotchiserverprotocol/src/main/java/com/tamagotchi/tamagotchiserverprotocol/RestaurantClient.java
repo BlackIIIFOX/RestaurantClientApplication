@@ -1,6 +1,7 @@
 package com.tamagotchi.tamagotchiserverprotocol;
 
-import com.tamagotchi.tamagotchiserverprotocol.routers.IAccountsApiService;
+import com.tamagotchi.tamagotchiserverprotocol.routers.IAccountApiService;
+import com.tamagotchi.tamagotchiserverprotocol.routers.IUsersApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAuthenticateApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IRestaurantsApiService;
 import com.tamagotchi.tamagotchiserverprotocol.services.AuthenticateInfoService;
@@ -20,15 +21,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RestaurantClient {
     private static RestaurantClient instance = null;
+    private static final String  BASE_URL = "http://316825-blackiiifox.tmweb.ru:3000/api/";
 
     private Retrofit retrofit;
     private OkHttpClient client;
-    private String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6Ik1hbmFnZXIiLCJpYXQiOjE1ODY5NzEyNTV9.lasbKegsStSGla3JY3dsIJLmQ2PriyGDh9kA8xA9Jds";
 
-    private IAccountsApiService accountsService;
+    private final IUsersApiService usersServices;
     private final AuthenticateInfoService authenticateInfoService = new AuthenticateInfoService();
     private final IAuthenticateApiService authenticateService;
     private final IRestaurantsApiService restaurantsService;
+    private final IAccountApiService accountService;
 
     /**
      * Инициализация retrofit клиента.
@@ -44,16 +46,13 @@ public class RestaurantClient {
                     // Добавляем JWT токен в запрос для аутентификации.
                     Request.Builder newRequest = chain.request().newBuilder();
                     if (authenticateInfoService.isAuthenticate()) {
-                        newRequest.addHeader("Authorization", "Bearer " + token);
+                        newRequest.addHeader("Authorization", "Bearer " + authenticateInfoService.getAuthenticateInfo().getToken());
                     }
 
                     return chain.proceed(newRequest.build());
                 })
                 .addInterceptor(logger)
                 .build();
-
-        // TODO: что то нужно сделать с жестко заданным URL.
-        String BASE_URL = "http://192.168.56.1:3000/api/";
 
         // Собираем retrofit клиент для отпрвки запросов на сервер.
         Retrofit retrofit = new Retrofit.Builder()
@@ -64,9 +63,10 @@ public class RestaurantClient {
                 .build();
 
         // Инициализируем маршрутизаторы retrofit
-        accountsService = retrofit.create(IAccountsApiService.class);
+        usersServices = retrofit.create(IUsersApiService.class);
         authenticateService = retrofit.create(IAuthenticateApiService.class);
         restaurantsService = retrofit.create(IRestaurantsApiService.class);
+        accountService = retrofit.create(IAccountApiService.class);
     }
 
     public synchronized static RestaurantClient getInstance() {
@@ -82,8 +82,8 @@ public class RestaurantClient {
      *
      * @return /api/user service
      */
-    public IAccountsApiService getAccountService() {
-        return accountsService;
+    public IUsersApiService getUsersService() {
+        return usersServices;
     }
 
     /**
@@ -98,7 +98,7 @@ public class RestaurantClient {
     /**
      * Предоставляет сервис для работы с данными авторизации.
      * Большенство запросов не будут работать без их установки.
-     * Для получения данных аутентификации используйте {@linkplain IAccountsApiService
+     * Для получения данных аутентификации используйте {@linkplain IUsersApiService
      * AccountsApiService}
      *
      * @return /api/user service
@@ -112,4 +112,10 @@ public class RestaurantClient {
      * @return /api/restaurants service
      */
     public IRestaurantsApiService getRestaurantsService() { return restaurantsService; }
+
+    /**
+     * Предоставлят сервис для работы с аккаунтом пользователя.
+     * @return /api/account
+     */
+    public IAccountApiService getAccountService() { return accountService; }
 }

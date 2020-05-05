@@ -4,11 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.tamagotchi.restaurantclientapplication.data.AccountsRepository;
 import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthLoginException;
 import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
-import com.tamagotchi.restaurantclientapplication.services.BootstrapService;
 
 public class StartViewModel extends ViewModel {
 

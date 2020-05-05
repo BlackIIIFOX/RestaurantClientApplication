@@ -4,9 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.tamagotchi.restaurantclientapplication.data.AccountsRepository;
 import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
-import com.tamagotchi.tamagotchiserverprotocol.RestaurantClient;
 
 public class StartViewModelFactory implements ViewModelProvider.Factory  {
     @NonNull

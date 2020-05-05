@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Данные отправляемые при запросе аутентификации и регистрации.
  */
-public class SignInfoModel {
+public class CredentialsModel {
     @SerializedName("login")
     @Expose
     private String login;
@@ -15,7 +15,7 @@ public class SignInfoModel {
     @Expose
     private String password;
 
-    public SignInfoModel(String login, String password) {
+    public CredentialsModel(String login, String password) {
         this.login = login;
         this.password = password;
     }

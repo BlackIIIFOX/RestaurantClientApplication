@@ -1,38 +1,27 @@
 package com.tamagotchi.restaurantclientapplication.services;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthLoginException;
 import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthPasswordException;
 import com.tamagotchi.restaurantclientapplication.data.model.LoginInfo;
 import com.tamagotchi.tamagotchiserverprotocol.models.AuthenticateInfoModel;
-import com.tamagotchi.tamagotchiserverprotocol.models.SignInfoModel;
+import com.tamagotchi.tamagotchiserverprotocol.models.CredentialsModel;
+import com.tamagotchi.tamagotchiserverprotocol.routers.IAccountApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAuthenticateApiService;
 import com.tamagotchi.tamagotchiserverprotocol.services.IAuthenticateInfoService;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.CompletableEmitter;
-import io.reactivex.rxjava3.core.CompletableOnSubscribe;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Observer;
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.HttpException;
-import retrofit2.Response;
 
 public class AuthenticationService {
 
     private static final Object syncInstance = new Object();
     private static AuthenticationService instance;
 
+    private IAccountApiService accountApiService;
     private IAuthenticateApiService authenticateApiService;
     private IAuthenticateInfoService authenticateInfoService;
     private AuthenticationInfoStorageService storageService = new AuthenticationInfoStorageService();
@@ -44,9 +33,10 @@ public class AuthenticationService {
         return isAuthenticatedSource;
     }
 
-    private AuthenticationService(IAuthenticateApiService authenticateApiService, IAuthenticateInfoService authenticateInfoService) {
+    private AuthenticationService(IAuthenticateApiService authenticateApiService, IAuthenticateInfoService authenticateInfoService, IAccountApiService accountApiService) {
         this.authenticateApiService = authenticateApiService;
         this.authenticateInfoService = authenticateInfoService;
+        this.accountApiService = accountApiService;
 
         isAuthenticatedSourceSubject = BehaviorSubject.create();
         isAuthenticatedSource = isAuthenticatedSourceSubject.hide();
@@ -59,9 +49,9 @@ public class AuthenticationService {
         }
     }
 
-    public synchronized static void InitializeService(IAuthenticateApiService authenticateApiService, IAuthenticateInfoService authenticateInfoService) {
+    synchronized static void InitializeService(IAuthenticateApiService authenticateApiService, IAuthenticateInfoService authenticateInfoService, IAccountApiService accountApiService) {
         synchronized (syncInstance) {
-            instance = new AuthenticationService(authenticateApiService, authenticateInfoService);
+            instance = new AuthenticationService(authenticateApiService, authenticateInfoService, accountApiService);
         }
     }
 
@@ -72,7 +62,7 @@ public class AuthenticationService {
     }
 
     public Completable signIn(LoginInfo loginInfo) {
-        SignInfoModel loginInfoModel = new SignInfoModel(loginInfo.getLogin(),
+        CredentialsModel loginInfoModel = new CredentialsModel(loginInfo.getLogin(),
                 loginInfo.getPassword().getPasswordMd5());
 
         // Сбрасываем предыдущее значение, т.к. оно вернеться подписчикам.
@@ -84,14 +74,14 @@ public class AuthenticationService {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             accountAuthData -> {
-                                // Если сервер не вернул jwt, но запрос был успешен, то нажуно проверять сервер.
+                                // Если сервер не вернул jwt, но запрос был успешен, то нажно проверять сервер.
                                 if (accountAuthData.getToken().isEmpty()) {
                                     source.onError(new Exception("Server fault. Check the server."));
                                     return;
                                 }
 
                                 // Сохраяем jwt и авторизируемся
-                                authenticateInfoService.LogIn(accountAuthData);
+                                authenticateInfoService.LogIn(new AuthenticateInfoModel(accountAuthData.getToken()));
                                 storageService.saveToken(accountAuthData.getToken());
                                 isAuthenticatedSourceSubject.onNext(true);
 
@@ -128,11 +118,18 @@ public class AuthenticationService {
         }
 
         if (authenticateInfoService.isAuthenticate()) {
-            isAuthenticatedSourceSubject.onNext(true);
+            this.accountApiService.getCurrentAccount().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+                    account -> {
+                        isAuthenticatedSourceSubject.onNext(true);
+                    }
+                    , error -> {
+                        isAuthenticatedSourceSubject.onError(new AuthLoginException());
+                        authenticateInfoService.LogOut();
+                        signOut();
+                    }
+            );
         } else {
             isAuthenticatedSourceSubject.onError(new AuthLoginException());
         }
     }
-
-
 }

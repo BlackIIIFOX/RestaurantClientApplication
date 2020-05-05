@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.tamagotchi.restaurantclientapplication.data.RestaurantsRepository;
+import com.tamagotchi.restaurantclientapplication.data.repositories.RestaurantsRepository;
 import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
 

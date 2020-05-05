@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.tamagotchi.tamagotchiserverprotocol.models.enums.Roles;
 
-public class AccountInfoModel {
+public class UserModel {
 
     @SerializedName("id")
     @Expose
@@ -14,21 +14,21 @@ public class AccountInfoModel {
     @Expose
     private String login;
 
-    @SerializedName("password")
-    @Expose
-    private String password;
-
     @SerializedName("role")
     @Expose
     private Roles role;
 
-    @SerializedName("full_name")
+    @SerializedName("fullName")
     @Expose
     private String fullName;
 
-    @SerializedName("is_blocked")
+    @SerializedName("isBlocked")
     @Expose
     private String isBlocked;
+
+    @SerializedName("avatar")
+    @Expose
+    private String avatar;
 
     public int getId() {
         return id;
@@ -58,19 +58,19 @@ public class AccountInfoModel {
         this.fullName = fullName;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
     public String getIsBlocked() {
         return isBlocked;
     }
 
     public void setIsBlocked(String isBlocked) {
         this.isBlocked = isBlocked;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

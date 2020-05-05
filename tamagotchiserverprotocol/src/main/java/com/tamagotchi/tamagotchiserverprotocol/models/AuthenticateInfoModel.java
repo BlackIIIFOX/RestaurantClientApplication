@@ -8,19 +8,11 @@ public class AuthenticateInfoModel {
     @Expose
     private String token;
 
-    @SerializedName("message")
-    @Expose
-    private String message;
-
     public AuthenticateInfoModel(String token) {
         this.token = token;
     }
 
     public String getToken() {
         return token;
-    }
-
-    public String getMessage() {
-        return message;
     }
 }
