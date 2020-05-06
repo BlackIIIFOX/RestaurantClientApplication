@@ -11,7 +11,8 @@ a mobile application with a convenient interface.
 ---
 
 ## Linked Repositories
-- [Server](https://github.com/paulrozhkin/NodeJsTamagotchiServer)
+- [Web client](https://github.com/paulrozhkin/tamagotchi-web-client)
+- [Server](https://github.com/paulrozhkin/tamagotchi-server)
 - [Android stuff application](https://github.com/ForsaiR/RestaurantEmployerApplication)
 
 ---
