@@ -24,13 +24,13 @@ public class MenuFragment extends Fragment {
         menuViewModel = new ViewModelProvider(this).get(MenuViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_menu, container, false);
-        final TextView textView = root.findViewById(R.id.text_menu);
-        menuViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+        //final TextView textView = root.findViewById(R.id.text_menu);
+//        menuViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
         return root;
     }
 }

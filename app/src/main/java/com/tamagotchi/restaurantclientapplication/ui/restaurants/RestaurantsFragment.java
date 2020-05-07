@@ -36,16 +36,16 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback 
 
         View root = inflater.inflate(R.layout.fragment_restaurants, container, false);
 
-        final TextView textView = root.findViewById(R.id.text_restaurants);
+        //final TextView textView = root.findViewById(R.id.text_restaurants);
 
         mapInitialize();
 
-        restaurantsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+//        restaurantsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
 
         return root;
     }

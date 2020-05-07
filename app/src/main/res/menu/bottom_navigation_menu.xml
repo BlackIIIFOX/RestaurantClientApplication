@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/navigation_restaurants"
+        android:icon="@drawable/ic_icon_restaurants"
+        android:title="Рестораны" />
+    <item android:id="@+id/navigation_menu"
+        android:icon="@drawable/ic_icon_menu"
+        android:title="Меню" />
+    <item android:id="@+id/navigation_orders"
+        android:icon="@drawable/ic_icon_shopping_bag"
+        android:title="Заказы" />
+</menu>

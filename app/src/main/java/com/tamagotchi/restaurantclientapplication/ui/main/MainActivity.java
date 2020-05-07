@@ -1,9 +1,12 @@
 package com.tamagotchi.restaurantclientapplication.ui.main;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -12,27 +15,46 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.tamagotchi.restaurantclientapplication.R;
+import com.tamagotchi.restaurantclientapplication.ui.menu.MenuFragment;
+import com.tamagotchi.restaurantclientapplication.ui.orders.OrdersFragment;
+import com.tamagotchi.restaurantclientapplication.ui.restaurants.RestaurantsFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
-    private MainViewModel mainViewModel;
+    private BottomNavigationView bottomNavigationView;
+
+    MenuFragment menuFragment = new MenuFragment();
+    OrdersFragment ordersFragment = new OrdersFragment();
+    RestaurantsFragment restaurantsFragment = new RestaurantsFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mainViewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_restaurants, R.id.navigation_menu, R.id.navigation_orders)
-                .build();
+        bottomNavigationView = findViewById(R.id.bottom_navigation_view);
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        bottomNavigationView.setSelectedItemId(R.id.navigation_restaurants);
+
     }
 
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.navigation_restaurants:
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, restaurantsFragment).commit();
+                return true;
+
+            case R.id.navigation_menu:
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, menuFragment).commit();
+                return true;
+
+            case R.id.navigation_orders:
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, ordersFragment).commit();
+                return true;
+        }
+
+        return false;
+    }
 }

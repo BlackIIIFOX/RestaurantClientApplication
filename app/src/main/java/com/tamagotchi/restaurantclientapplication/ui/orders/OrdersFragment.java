@@ -23,13 +23,13 @@ public class OrdersFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         ordersViewModel = new ViewModelProvider(this).get(OrdersViewModel.class);
         View root = inflater.inflate(R.layout.fragment_orders, container, false);
-        final TextView textView = root.findViewById(R.id.text_orders);
-        ordersViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+        //final TextView textView = root.findViewById(R.id.text_orders);
+//        ordersViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
         return root;
     }
 }
