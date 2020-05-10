@@ -44,4 +44,13 @@ dependencies {
     annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
     implementation 'io.reactivex.rxjava3:rxjava:3.0.2'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+
+    // Material Design
+    implementation 'com.google.android.material:material:1.2.0-alpha06'
+
+    // Rounded Image View
+    implementation 'com.makeramen:roundedimageview:2.3.0'
+
+    compile 'com.google.android.gms:play-services-maps:17.0.0'
+    compile 'com.google.android.gms:play-services-location:17.0.0'
 }

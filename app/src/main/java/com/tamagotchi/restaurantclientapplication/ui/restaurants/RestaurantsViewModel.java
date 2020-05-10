@@ -14,14 +14,11 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class RestaurantsViewModel extends ViewModel {
-    private MutableLiveData<String> mText;
     private RestaurantsRepository restaurantsRepository;
     private MutableLiveData<Result<List<RestaurantModel>>> restaurants = new MutableLiveData<>();
 
     public RestaurantsViewModel() {
         this.restaurantsRepository = RestaurantsRepository.getInstance();
-        mText = new MutableLiveData<>();
-        mText.setValue("This is restaurants fragment");
 
         this.restaurantsRepository.getAllRestaurants()
                 .subscribeOn(Schedulers.io())
@@ -36,9 +33,7 @@ public class RestaurantsViewModel extends ViewModel {
                 );
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public LiveData<Result<List<RestaurantModel>>> getRestaurants() {
+        return restaurants;
     }
-
-    public LiveData<Result<List<RestaurantModel>>> getRestaurants() { return restaurants; };
 }
