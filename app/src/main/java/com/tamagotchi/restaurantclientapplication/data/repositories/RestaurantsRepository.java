@@ -5,12 +5,9 @@ import com.tamagotchi.restaurantclientapplication.data.exceptions.NotFoundExcept
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IRestaurantsApiService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.HttpException;
