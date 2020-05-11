@@ -26,9 +26,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private BottomNavigationView bottomNavigationView;
 
-    MenuFragment menuFragment = new MenuFragment();
-    OrdersFragment ordersFragment = new OrdersFragment();
-    RestaurantsFragment restaurantsFragment = new RestaurantsFragment();
+    private MenuFragment menuFragment = new MenuFragment();
+    private OrdersFragment ordersFragment = new OrdersFragment();
+    private RestaurantsFragment restaurantsFragment = new RestaurantsFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +46,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.navigation_restaurants:
-                //if (isServicesOK()) {
+                if (isServicesOK()) {
                     getSupportFragmentManager().beginTransaction().replace(R.id.container, restaurantsFragment).commit();
-                //}
+                }
                 return true;
 
             case R.id.navigation_menu:

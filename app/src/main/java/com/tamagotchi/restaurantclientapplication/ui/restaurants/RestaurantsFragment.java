@@ -1,13 +1,16 @@
 package com.tamagotchi.restaurantclientapplication.ui.restaurants;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,22 +22,22 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
 
 import java.util.List;
-import java.util.Objects;
 
-public class RestaurantsFragment extends Fragment implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
+public class RestaurantsFragment extends Fragment implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMarkerClickListener {
 
     private static final String TAG = "RestaurantsFragment";
 
@@ -60,9 +63,16 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         View root = inflater.inflate(R.layout.fragment_restaurants, container, false);
 
         getLocationPermission();
-        initMap();
 
         return root;
+    }
+
+    public boolean isGeoEnabled() {
+        LocationManager mLocationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
+        boolean mIsGPSEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean mIsNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        mGPSPermissionsGranted = mIsGPSEnabled && mIsNetworkEnabled;
+        return mGPSPermissionsGranted;
     }
 
     private void getDeviceLocation() {
@@ -98,10 +108,15 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap; //Добавать метки на карту
+        mMap = googleMap;
         updateMap();
 
-        if (mLocationPermissionsGranted) {
+        if (mLocationPermissionsGranted) {  //TODO: Нужно ли тут это условие?
+            if (!isGeoEnabled()) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.9386300, 30.3141300), 10f));
+                return;
+            }
+
             getDeviceLocation();
 
             if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -109,7 +124,6 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
                 return;
             }
             mMap.setMyLocationEnabled(true);
-            mGPSPermissionsGranted = true;
         }
     }
 
@@ -118,21 +132,20 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         {
             if (result instanceof Result.Success) {
                 List<RestaurantModel> restaurants = (List<RestaurantModel>)((Result.Success) result).getData();
+                LatLng restaurantPos;
 
-                LatLng restaurantPos = new LatLng(59.9386300, 30.3141300);
                 for (int i = 0; i < restaurants.size(); i++) {
                     RestaurantModel restaurant = restaurants.get(i);
 
-                    // Add a marker in Sydney and move the camera
                     restaurantPos = new LatLng(restaurant.getPositionLatitude(), restaurant.getPositionLongitude());
                     mMap.addMarker(new MarkerOptions().position(restaurantPos).title(restaurant.getAddress()));
                 }
-
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(restaurantPos, 15));
             } else {
                 // TODO: обработка ошибки
             }
         });
+
+        mMap.setOnMarkerClickListener(this);
     }
 
     private void getLocationPermission() {
@@ -141,7 +154,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         if (ContextCompat.checkSelfPermission(this.requireContext(), FINE_LICATION) == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(this.requireContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mLocationPermissionsGranted = true;
-                //initMap();    //Тут подключаем положение телефона
+                initMap();
             } else {
                 ActivityCompat.requestPermissions(this.requireActivity(), permission, LOCATION_PERMISSION_REQUEST_CODE);
             }
@@ -163,8 +176,18 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
                     }
                 }
                 mLocationPermissionsGranted = true; //initialization our map
-                //initMap();    //Тут подключаем положение телефона
+                initMap();
             }
         }
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        //View selectedMarker = LayoutInflater.from(this.requireContext()).inflate(R.layout.sliding_panel_restaurant, requireView().findViewById(R.id.PanelRestaurantContainer));
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(RestaurantsFragment.this.requireActivity(), R.style.BottomSheetDialogTheme);
+        View buttomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.sliding_panel_fragment, (LinearLayout) requireView().findViewById(R.id.panelRestaurantContainer));
+        bottomSheetDialog.setContentView(buttomSheetView);
+        bottomSheetDialog.show();
+        return true;
     }
 }
