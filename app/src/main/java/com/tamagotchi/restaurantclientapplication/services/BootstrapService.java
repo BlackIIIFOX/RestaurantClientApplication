@@ -1,5 +1,7 @@
 package com.tamagotchi.restaurantclientapplication.services;
 
+import com.tamagotchi.restaurantclientapplication.data.repositories.DishesRepository;
+import com.tamagotchi.restaurantclientapplication.data.repositories.MenuRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.UsersRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.RestaurantsRepository;
 import com.tamagotchi.tamagotchiserverprotocol.RestaurantClient;
@@ -38,6 +40,8 @@ public class BootstrapService {
 
         UsersRepository.InitializeService(client.getUsersService());
         RestaurantsRepository.InitializeService(client.getRestaurantsService());
+        DishesRepository.InitializeService(client.getDishesService());
+        MenuRepository.InitializeService(client.getMenuService());
 
         isInitialized = true;
     }

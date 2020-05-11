@@ -1,6 +1,8 @@
 package com.tamagotchi.tamagotchiserverprotocol;
 
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAccountApiService;
+import com.tamagotchi.tamagotchiserverprotocol.routers.IDishesApiService;
+import com.tamagotchi.tamagotchiserverprotocol.routers.IMenuApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IUsersApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAuthenticateApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IRestaurantsApiService;
@@ -21,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RestaurantClient {
     private static RestaurantClient instance = null;
-    private static final String  BASE_URL = "http://316825-blackiiifox.tmweb.ru:3000/api/";
+    public static final String  BASE_URL = "http://restaurant-tamagotchi.ru:3000/api/";
 
     private Retrofit retrofit;
     private OkHttpClient client;
@@ -31,6 +33,8 @@ public class RestaurantClient {
     private final IAuthenticateApiService authenticateService;
     private final IRestaurantsApiService restaurantsService;
     private final IAccountApiService accountService;
+    private final IDishesApiService dishesService;
+    private final IMenuApiService menuApiService;
 
     /**
      * Инициализация retrofit клиента.
@@ -67,6 +71,8 @@ public class RestaurantClient {
         authenticateService = retrofit.create(IAuthenticateApiService.class);
         restaurantsService = retrofit.create(IRestaurantsApiService.class);
         accountService = retrofit.create(IAccountApiService.class);
+        dishesService = retrofit.create(IDishesApiService.class);
+        menuApiService = retrofit.create(IMenuApiService.class);
     }
 
     public synchronized static RestaurantClient getInstance() {
@@ -118,4 +124,16 @@ public class RestaurantClient {
      * @return /api/account
      */
     public IAccountApiService getAccountService() { return accountService; }
+
+    /**
+     * Предоставлят сервис для работы с блюдами в системе.
+     * @return /api/dishes
+     */
+    public IDishesApiService getDishesService() { return dishesService; }
+
+    /**
+     * Предоставлят сервис для работы с меню ресторана.
+     * @return /api/dishes
+     */
+    public IMenuApiService getMenuService() { return menuApiService; }
 }
