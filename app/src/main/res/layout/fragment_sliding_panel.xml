@@ -78,7 +78,7 @@
             android:paddingTop="14dp"
             android:paddingBottom="14dp"
             android:layout_gravity="center"
-            android:text="@string/address"
+            android:text="Address"
             android:textSize="15sp"/>
 
     </LinearLayout>
@@ -142,6 +142,7 @@
             android:src="@drawable/ic_remove_circle"/>
 
         <TextView
+            android:id="@+id/countGuest"
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -176,7 +177,7 @@
             android:textColor="@color/colorWhite"
             android:textSize="15sp" />
 
-        <com.makeramen.roundedimageview.RoundedImageView
+        <ImageView
             android:id="@+id/wifi"
             android:layout_height="30dp"
             android:layout_width="30dp"
@@ -186,7 +187,7 @@
             android:layout_marginStart="60dp"
             android:src="@drawable/ic_wifi" />
 
-        <com.makeramen.roundedimageview.RoundedImageView
+        <ImageView
             android:id="@+id/carParking"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -196,7 +197,7 @@
             android:layout_marginStart="20dp"
             android:src="@drawable/ic_car_parking" />
 
-        <com.makeramen.roundedimageview.RoundedImageView
+        <ImageView
             android:id="@+id/creditCard"
             android:layout_width="30dp"
             android:layout_height="30dp"
