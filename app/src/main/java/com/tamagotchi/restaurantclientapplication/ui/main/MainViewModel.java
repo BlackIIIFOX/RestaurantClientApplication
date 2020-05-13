@@ -5,10 +5,11 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.tamagotchi.restaurantclientapplication.data.Result;
+import com.tamagotchi.restaurantclientapplication.data.model.OrderVisitInfo;
 import com.tamagotchi.restaurantclientapplication.data.repositories.RestaurantsRepository;
-import com.tamagotchi.restaurantclientapplication.services.OrderManager;
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
 
+import java.util.Calendar;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -27,6 +28,11 @@ public class MainViewModel extends ViewModel {
     private MutableLiveData<Result<List<RestaurantModel>>> restaurants = new MutableLiveData<>();
 
     /**
+     *  Информация о посещении выбранного ресторана.
+     */
+    private MutableLiveData<OrderVisitInfo> orderVisitInfo = new MutableLiveData<>();
+
+    /**
      * Выбранный ресторан.
      */
     private MutableLiveData<RestaurantModel> selectedRestaurant  = new MutableLiveData<>();;
@@ -34,6 +40,13 @@ public class MainViewModel extends ViewModel {
     MainViewModel(RestaurantsRepository restaurantsRepository) {
         this.restaurantsRepository = restaurantsRepository;
         InitRestaurants();
+        InitOrderVisitInfo();
+    }
+
+    private void InitOrderVisitInfo() {
+        Calendar visitTIme = Calendar.getInstance();
+        visitTIme.add(Calendar.HOUR, 1);
+        orderVisitInfo.setValue(new OrderVisitInfo(visitTIme, 1));
     }
 
     public LiveData<Result<List<RestaurantModel>>> getRestaurants() {
@@ -44,6 +57,14 @@ public class MainViewModel extends ViewModel {
 
     public void setSelectedRestaurant(RestaurantModel restaurant) {
         selectedRestaurant.setValue(restaurant);
+    }
+
+    public LiveData<OrderVisitInfo> getOrderVisitInfo() {
+        return orderVisitInfo;
+    }
+
+    public void setOrderVisitInfo(OrderVisitInfo visitInfo) {
+        orderVisitInfo.setValue(visitInfo);
     }
 
     private void InitRestaurants() {

@@ -19,19 +19,14 @@ import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 
 public class OrdersFragment extends Fragment {
 
-    private MainViewModel ordersViewModel;
+    private MainViewModel viewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        ordersViewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
         View root = inflater.inflate(R.layout.fragment_orders, container, false);
-        //final TextView textView = root.findViewById(R.id.text_orders);
-//        ordersViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-//            }
-//        });
+
+
         return root;
     }
 }

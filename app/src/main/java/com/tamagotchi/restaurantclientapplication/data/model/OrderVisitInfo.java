@@ -1,12 +1,12 @@
 package com.tamagotchi.restaurantclientapplication.data.model;
 
-import java.util.Date;
+import java.util.Calendar;
 
 /**
  * Класс, содержащий информацию о посещении ресторана.
  */
 public class OrderVisitInfo {
-    private Date visitTime;
+    private Calendar visitTime;
     private int numberOfVisitors;
 
     /**
@@ -14,13 +14,12 @@ public class OrderVisitInfo {
      * @param visitTime время посещения (во сколько придет клиент).
      * @param numberOfVisitors количество посетителей.
      */
-    public OrderVisitInfo(Date visitTime, int numberOfVisitors) {
-
+    public OrderVisitInfo(Calendar visitTime, int numberOfVisitors) {
         this.visitTime = visitTime;
         this.numberOfVisitors = numberOfVisitors;
     }
 
-    public Date getVisitTime() {
+    public Calendar getVisitTime() {
         return visitTime;
     }
 
