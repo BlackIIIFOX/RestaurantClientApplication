@@ -17,7 +17,7 @@ public class Application extends android.app.Application {
         mApp = this;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         BootstrapService.getInstance().InitializeApplication();
-        //AuthenticationService.getInstance().signOut();
+        // AuthenticationService.getInstance().signOut();
     }
 
     public static Application get() {
