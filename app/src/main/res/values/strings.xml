@@ -27,4 +27,5 @@
     <string name="still">Еще</string>
     <string name="makeOrder">Сделать заказ</string>
     <string name="numberOfGuests">Количество гостей:</string>
+    <string name="make_payment">Опатить</string>
 </resources>

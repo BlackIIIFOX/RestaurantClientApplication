@@ -1,6 +1,7 @@
 package com.tamagotchi.restaurantclientapplication.ui.main;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -18,6 +19,9 @@ import com.tamagotchi.restaurantclientapplication.ui.menu.MenuFragment;
 import com.tamagotchi.restaurantclientapplication.ui.orders.OrdersFragment;
 import com.tamagotchi.restaurantclientapplication.ui.restaurants.RestaurantsFragment;
 import com.tamagotchi.restaurantclientapplication.ui.still.StillFragment;
+
+import ru.yandex.money.android.sdk.Checkout;
+import ru.yandex.money.android.sdk.TokenizationResult;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -82,5 +86,28 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             Toast.makeText(this, "You can't make map request", Toast.LENGTH_SHORT).show();
         }
         return false;
+    }
+
+    @Override
+    public  void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Результат оплаты.
+        if (requestCode == OrdersFragment.REQUEST_CODE_TOKENIZE) {
+            switch (resultCode) {
+                case RESULT_OK:
+                    // successful tokenization
+                    // Токен сформирован, дальше нужно отправить его на сервер и ждать результат,
+                    // но для этого надо подключить яндекс кассы (быть ИП или индивидуальным предпринимателем).
+                    TokenizationResult result = Checkout.createTokenizationResult(data);
+                    result.getPaymentToken();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, stillFragment).commit();
+                    bottomNavigationView.setSelectedItemId(R.id.navigation_still);
+                    break;
+                case RESULT_CANCELED:
+                    // user canceled tokenization
+                    break;
+            }
+        }
     }
 }
