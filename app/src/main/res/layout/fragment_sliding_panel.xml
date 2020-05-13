@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/panelRestaurantContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/sliding_panel_background"
+    android:orientation="vertical"
+    tools:context=".ui.slidingpanel.SlidingPanelFragment">
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="20dp">
+
+            <TextView
+                android:id="@+id/selector"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:background="@color/colorSelectItem"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <ImageView
+                android:id="@+id/horizontalPoints"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:scaleType="center"
+                android:src="@drawable/ic_horizontal_points"
+                app:itemIconTint="@color/colorWhite" />
+        </FrameLayout>
+
+    <TextView
+            android:id="@+id/galleryListView"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:background="#E4DD95"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="Gallery ListView or LinerLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+    <View
+            android:id="@+id/galleryDownView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/galleryListView"
+            />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:padding="5dp"
+            android:src="@drawable/ic_building"
+            android:layout_marginEnd="5dp"
+            />
+
+        <TextView
+            android:id="@+id/restaurantAddress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:layout_gravity="center"
+            android:text="@string/address"
+            android:textSize="15sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#D9B2E1"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="18.05.2021"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#95C4E4"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="15:00-17:00"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="175dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="50dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:paddingStart="5dp"
+            android:text="@string/numberOfGuests"
+            android:textSize="15sp" />
+
+        <ImageButton
+            android:id="@+id/removeGuest"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="46dp"
+            android:background="@color/colorWhite"
+            android:gravity="center"
+            android:src="@drawable/ic_remove_circle"/>
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="1"
+            android:textSize="15sp" />
+
+        <ImageButton
+            android:id="@+id/addGuest"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite"
+            android:gravity="center"
+            android:src="@drawable/ic_add_circle"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonMakeOrder"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/button_make_order_background"
+            android:text="@string/makeOrder"
+            android:textColor="@color/colorWhite"
+            android:textSize="15sp" />
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/wifi"
+            android:layout_height="30dp"
+            android:layout_width="30dp"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="60dp"
+            android:src="@drawable/ic_wifi" />
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/carParking"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/ic_car_parking" />
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/creditCard"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="11dp"
+            android:layout_marginBottom="9dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/ic_credit_card" />
+
+    </LinearLayout>
+
+</LinearLayout>

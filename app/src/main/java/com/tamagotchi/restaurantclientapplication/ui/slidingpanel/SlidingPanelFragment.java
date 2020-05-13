@@ -1,7 +1,6 @@
 package com.tamagotchi.restaurantclientapplication.ui.slidingpanel;
 
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
 
@@ -19,16 +18,25 @@ import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 
 public class SlidingPanelFragment extends Fragment {
 
-    public static SlidingPanelFragment newInstance() {
-        return new SlidingPanelFragment();
-    }
     private MainViewModel viewModel;
+    private View viewSlidinganel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
 
-        return inflater.inflate(R.layout.sliding_panel_fragment, container, false);
+        viewSlidinganel = inflater.inflate(R.layout.fragment_sliding_panel, container, false);
+
+//        final TextView textView = root.findViewById(R.id.text_menu);
+//
+//        viewSlidinganel.findViewById(R.id.buttonMakeOrder).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+
+        return viewSlidinganel;
     }
 
     /**
@@ -37,6 +45,7 @@ public class SlidingPanelFragment extends Fragment {
     public void InitSelectedRestaurant() {
         viewModel.getSelectedRestaurant().observe(this, restaurant -> {
             // Вот мы его и получили, дальше можно с ним работать.
+
         });
     }
 }

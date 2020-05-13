@@ -24,20 +24,17 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
-import com.tamagotchi.restaurantclientapplication.ui.start.StartViewModelFactory;
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
 
 import java.util.HashMap;
@@ -145,7 +142,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
                     restaurantPos = new LatLng(restaurant.getPositionLatitude(), restaurant.getPositionLongitude());
 
                     MarkerOptions markerOptions = new MarkerOptions().position(restaurantPos).title(restaurant.getAddress());
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
                     Marker restaurantMarker = mMap.addMarker(markerOptions);
                     restaurantMarker.setTag(restaurant); // Добавляем объект рестарана в качестве тега.
@@ -162,7 +159,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
                         Marker previous = markers.get(lastSelectedMarker);
 
                         if (previous != null)
-                            previous.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                            previous.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                     }
 
                     // Устанавливаем зеленый цвет на текущий маркер.
@@ -223,7 +220,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         viewModel.setSelectedRestaurant(currentRestaurant);
 
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(RestaurantsFragment.this.requireActivity(), R.style.BottomSheetDialogTheme);
-        View bottomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.sliding_panel_fragment, (LinearLayout) requireView().findViewById(R.id.panelRestaurantContainer));
+        View bottomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.fragment_sliding_panel, (LinearLayout) requireView().findViewById(R.id.panelRestaurantContainer));
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
         return true;

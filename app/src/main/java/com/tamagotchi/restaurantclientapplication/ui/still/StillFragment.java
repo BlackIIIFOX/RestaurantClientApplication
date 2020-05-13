@@ -11,19 +11,18 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.tamagotchi.restaurantclientapplication.R;
+import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
+import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
+
 import androidx.annotation.Nullable;
 
 public class StillFragment extends Fragment {
 
-    private StillViewModel stillViewModel;
-
-    public static StillFragment newInstance() {
-        return new StillFragment();
-    }
+    private MainViewModel viewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        stillViewModel = new ViewModelProvider(this).get(StillViewModel.class);
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
 
         return inflater.inflate(R.layout.fragment_still, container, false);
     }
