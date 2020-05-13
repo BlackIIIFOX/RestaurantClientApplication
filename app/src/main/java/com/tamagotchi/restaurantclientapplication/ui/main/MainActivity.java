@@ -17,6 +17,7 @@ import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.ui.menu.MenuFragment;
 import com.tamagotchi.restaurantclientapplication.ui.orders.OrdersFragment;
 import com.tamagotchi.restaurantclientapplication.ui.restaurants.RestaurantsFragment;
+import com.tamagotchi.restaurantclientapplication.ui.still.StillFragment;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -26,9 +27,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private BottomNavigationView bottomNavigationView;
 
+    private RestaurantsFragment restaurantsFragment = new RestaurantsFragment();
     private MenuFragment menuFragment = new MenuFragment();
     private OrdersFragment ordersFragment = new OrdersFragment();
-    private RestaurantsFragment restaurantsFragment = new RestaurantsFragment();
+    private StillFragment stillFragment = new StillFragment();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +61,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             case R.id.navigation_orders:
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, ordersFragment).commit();
                 return true;
+
+            case R.id.navigation_still:
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, stillFragment).commit();
+                return true;
         }
+
         return false;
     }
 

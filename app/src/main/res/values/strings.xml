@@ -21,4 +21,8 @@
     <string name="title_menu">Меню</string>
     <string name="title_orders">Заказы</string>
     <string name="title_restaurants">Рестораны</string>
+    <string name="restaurants">Рестораны</string>
+    <string name="menu">Меню</string>
+    <string name="order">Заказ</string>
+    <string name="still">Еще</string>
 </resources>

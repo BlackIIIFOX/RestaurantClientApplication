@@ -2,11 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/navigation_restaurants"
         android:icon="@drawable/ic_icon_restaurants"
-        android:title="Рестораны" />
+        android:title="@string/restaurants"/>
     <item android:id="@+id/navigation_menu"
         android:icon="@drawable/ic_icon_menu"
-        android:title="Меню" />
+        android:title="@string/menu" />
     <item android:id="@+id/navigation_orders"
         android:icon="@drawable/ic_icon_shopping_bag"
-        android:title="Заказы" />
+        android:title="@string/order" />
+    <item android:id="@+id/navigation_still"
+        android:icon="@drawable/ic_still"
+        android:title="@string/still" />
 </menu>
