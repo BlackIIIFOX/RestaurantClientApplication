@@ -10,13 +10,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.tamagotchi.restaurantclientapplication.R;
+import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
+import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 
 public class MenuFragment extends Fragment {
 
-    private MenuViewModel menuViewModel;
+    private MainViewModel viewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        menuViewModel = new ViewModelProvider(this).get(MenuViewModel.class);
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_menu, container, false);
         //final TextView textView = root.findViewById(R.id.text_menu);

@@ -24,6 +24,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -33,8 +35,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.Result;
+import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
+import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
+import com.tamagotchi.restaurantclientapplication.ui.start.StartViewModelFactory;
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class RestaurantsFragment extends Fragment implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMarkerClickListener {
@@ -45,6 +51,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final float DEFAULT_ZOOM = 15f;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    private Integer lastSelectedMarker = null;
 
     private Boolean mLocationPermissionsGranted = false;
     private Boolean mGPSPermissionsGranted = false;
@@ -52,13 +59,13 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
-    private RestaurantsViewModel restaurantsViewModel;
+    private MainViewModel viewModel;
 
     public RestaurantsFragment() {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        restaurantsViewModel = new ViewModelProvider(this).get(RestaurantsViewModel.class);
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_restaurants, container, false);
 
@@ -80,17 +87,14 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
 
         try {
             if (mLocationPermissionsGranted) {
-                Task location =  mFusedLocationProviderClient.getLastLocation();
-                location.addOnCompleteListener(new OnCompleteListener() {
-                    @Override
-                    public void onComplete(@NonNull Task task) {
-                        if (task.isSuccessful()) {
-                            Location currentLocation = (Location) task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM));
-                        } else {
-                            Log.d(TAG, "onComplete: current location is null");
-                            Toast.makeText(RestaurantsFragment.this.requireContext(),"unable to get current location", Toast.LENGTH_SHORT).show();
-                        }
+                Task location = mFusedLocationProviderClient.getLastLocation();
+                location.addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Location currentLocation = (Location) task.getResult();
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM));
+                    } else {
+                        Log.d(TAG, "onComplete: current location is null");
+                        Toast.makeText(RestaurantsFragment.this.requireContext(), "unable to get current location", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -128,18 +132,47 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void updateMap() {
-        restaurantsViewModel.getRestaurants().observe(getViewLifecycleOwner(), result ->
+        viewModel.getRestaurants().observe(getViewLifecycleOwner(), result ->
         {
             if (result instanceof Result.Success) {
-                List<RestaurantModel> restaurants = (List<RestaurantModel>)((Result.Success) result).getData();
+                List<RestaurantModel> restaurants = (List<RestaurantModel>) ((Result.Success) result).getData();
                 LatLng restaurantPos;
 
+                HashMap<Integer, Marker> markers = new HashMap();
                 for (int i = 0; i < restaurants.size(); i++) {
                     RestaurantModel restaurant = restaurants.get(i);
 
                     restaurantPos = new LatLng(restaurant.getPositionLatitude(), restaurant.getPositionLongitude());
-                    mMap.addMarker(new MarkerOptions().position(restaurantPos).title(restaurant.getAddress()));
+
+                    MarkerOptions markerOptions = new MarkerOptions().position(restaurantPos).title(restaurant.getAddress());
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+
+                    Marker restaurantMarker = mMap.addMarker(markerOptions);
+                    restaurantMarker.setTag(restaurant); // Добавляем объект рестарана в качестве тега.
+                    markers.put(restaurant.getId(), restaurantMarker);
                 }
+
+                // Подписываемся на обновление выбранного маркера.
+                viewModel.getSelectedRestaurant().observe(this, selectedRestaurant -> {
+                    if (selectedRestaurant == null)
+                        return;
+
+                    // Сбрасываем цвет прошлого маркера
+                    if (lastSelectedMarker != null) {
+                        Marker previous = markers.get(lastSelectedMarker);
+
+                        if (previous != null)
+                            previous.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                    }
+
+                    // Устанавливаем зеленый цвет на текущий маркер.
+                    Marker selected = markers.get(selectedRestaurant.getId());
+
+                    if (selected != null) {
+                        selected.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                        lastSelectedMarker = selectedRestaurant.getId();
+                    }
+                });
             } else {
                 // TODO: обработка ошибки
             }
@@ -184,9 +217,14 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public boolean onMarkerClick(Marker marker) {
         //View selectedMarker = LayoutInflater.from(this.requireContext()).inflate(R.layout.sliding_panel_restaurant, requireView().findViewById(R.id.PanelRestaurantContainer));
+
+        // Получаем выбранный ресторан и устанавливаем его в ViewModel
+        RestaurantModel currentRestaurant = (RestaurantModel) marker.getTag();
+        viewModel.setSelectedRestaurant(currentRestaurant);
+
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(RestaurantsFragment.this.requireActivity(), R.style.BottomSheetDialogTheme);
-        View buttomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.sliding_panel_fragment, (LinearLayout) requireView().findViewById(R.id.panelRestaurantContainer));
-        bottomSheetDialog.setContentView(buttomSheetView);
+        View bottomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.sliding_panel_fragment, (LinearLayout) requireView().findViewById(R.id.panelRestaurantContainer));
+        bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
         return true;
     }

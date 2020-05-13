@@ -14,16 +14,29 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tamagotchi.restaurantclientapplication.R;
-import com.tamagotchi.restaurantclientapplication.ui.still.StillViewModel;
+import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
+import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 
 public class SlidingPanelFragment extends Fragment {
 
-    private SlidingPanelViewModel slidingPanelViewModel;
+    public static SlidingPanelFragment newInstance() {
+        return new SlidingPanelFragment();
+    }
+    private MainViewModel viewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        slidingPanelViewModel = new ViewModelProvider(this).get(SlidingPanelViewModel.class);
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
 
         return inflater.inflate(R.layout.sliding_panel_fragment, container, false);
+    }
+
+    /**
+     * Получаем текущий ресторан из ViewModel.
+     */
+    public void InitSelectedRestaurant() {
+        viewModel.getSelectedRestaurant().observe(this, restaurant -> {
+            // Вот мы его и получили, дальше можно с ним работать.
+        });
     }
 }

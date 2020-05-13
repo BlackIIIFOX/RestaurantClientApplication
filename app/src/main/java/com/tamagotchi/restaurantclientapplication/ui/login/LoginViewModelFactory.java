@@ -13,15 +13,21 @@ import com.tamagotchi.restaurantclientapplication.services.AuthenticationService
  */
 public class LoginViewModelFactory implements ViewModelProvider.Factory {
 
+    private static LoginViewModel viewModel;
+
     @NonNull
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+    public synchronized  <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(LoginViewModel.class)) {
-            return (T) new LoginViewModel(
-                    UsersRepository.getInstance(),
-                    AuthenticationService.getInstance()
-            );
+            if (viewModel == null) {
+                viewModel = new LoginViewModel(
+                        UsersRepository.getInstance(),
+                        AuthenticationService.getInstance()
+                );
+            }
+
+            return (T) viewModel;
         } else {
             throw new IllegalArgumentException("Unknown ViewModel class");
         }
