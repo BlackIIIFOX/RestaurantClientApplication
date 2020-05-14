@@ -2,6 +2,7 @@ package com.tamagotchi.restaurantclientapplication.ui.slidingpanel;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;

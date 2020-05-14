@@ -121,13 +121,13 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         mMap = googleMap;
         updateMap();
 
-        if (mLocationPermissionsGranted) {  //TODO: Нужно ли тут это условие?
+        if (mLocationPermissionsGranted) {
             if (!isGeoEnabled()) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.9386300, 30.3141300), 10f));
                 return;
             }
 
-            getDeviceLocation();
+            //getDeviceLocation(); //TODO: Потом убрать коментарий, сейчас пусть просто наводит на Питер
 
             if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -229,44 +229,9 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(RestaurantsFragment.this.requireActivity(), R.style.BottomSheetDialogTheme);
         View bottomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.fragment_sliding_panel, (LinearLayout) requireView().findViewById(R.id.panelRestaurantContainer));
 
-        viewModel.getOrderVisitInfo().observe(getViewLifecycleOwner(), orderVisitInfo -> {
-            setTextInTextView(bottomSheetView.findViewById(R.id.restaurantAddress), String.valueOf(orderVisitInfo.getNumberOfVisitors()));
-            //TODO: Надежды нет, везде добавить проверку и потом добавить дату и время
-        });
-
-        viewModel.getSelectedRestaurant().observe(getViewLifecycleOwner(), restaurant -> {
-            // Вот мы его и получили, дальше можно с ним работать.
-            setTextInTextView(bottomSheetView.findViewById(R.id.restaurantAddress), restaurant.getAddress());
-
-            //Показываем пользователю какие блага есть в ресторани (там парковочка бесплатная, wi-fi, оплата картой)
-                setRestaurantPresentParam(bottomSheetView.findViewById(R.id.carParking), restaurant.getCardPaymentPresent());
-                setRestaurantPresentParam(bottomSheetView.findViewById(R.id.wifi), restaurant.getWifiPresent());
-                setRestaurantPresentParam(bottomSheetView.findViewById(R.id.creditCard), restaurant.getParkingPresent());
-        });
-
-        bottomSheetView.findViewById(R.id.buttonMakeOrder).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, new MenuFragment()).commit();
-                bottomSheetDialog.dismiss();
-            }
-        });
-
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
 
         return true;
-    }
-
-    private void setTextInTextView(TextView textView, String text) {
-        textView.setText(text);
-    }
-
-    private void setRestaurantPresentParam(ImageView imageView, boolean activParam) {
-        if (activParam) {
-            DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(imageView.getContext(), R.color.colorSelectItem));
-        } else {
-            DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(imageView.getContext(), R.color.colorUnSelectItem));
-        }
     }
 }
