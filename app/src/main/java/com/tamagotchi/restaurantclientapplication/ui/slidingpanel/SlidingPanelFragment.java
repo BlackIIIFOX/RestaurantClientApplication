@@ -30,11 +30,17 @@ import com.tamagotchi.restaurantclientapplication.ui.main.Navigation;
 public class SlidingPanelFragment extends BottomSheetDialogFragment {
 
     private static final String TAG = "SlidingPanelFragment";
+    private static SlidingPanelFragment slidingPanelFragment;
     private MainViewModel viewModel;
     private View viewSlidingPanel;
 
     public static SlidingPanelFragment newInstance() {
-        return new SlidingPanelFragment();
+        if (slidingPanelFragment != null) {
+            return slidingPanelFragment;
+        } else {
+            slidingPanelFragment = new SlidingPanelFragment();
+            return slidingPanelFragment;
+        }
     }
 
     @Override
@@ -53,15 +59,12 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
         Button makeOrder = viewSlidingPanel.findViewById(R.id.buttonMakeOrder);
         makeOrder.setOnClickListener((view) -> {
             viewModel.setSelectedNavigation(Navigation.Menu);
+            slidingPanelFragment.dismiss();
         });
-
     }
 
     private void initVisitInfo() {
         viewModel.getOrderVisitInfo().observe(getViewLifecycleOwner(), orderVisitInfo -> {
-
-            Log.d(TAG, String.valueOf(orderVisitInfo.getNumberOfVisitors()));
-
             setTextInTextView(viewSlidingPanel.findViewById(R.id.restaurantAddress), String.valueOf(orderVisitInfo.getNumberOfVisitors()));
 
             //TODO: Надежды нет, везде добавить проверку и потом добавить дату и время
@@ -74,25 +77,11 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
     private void initSelectedRestaurant() {
         viewModel.getSelectedRestaurant().observe(getViewLifecycleOwner(), restaurant -> {
             // Вот мы его и получили, дальше можно с ним работать.
+            // Устанавиваем адрес ресторана и показываем пользователю какие блага есть в ресторани (там парковочка бесплатная, wi-fi, оплата картой)
             setTextInTextView(viewSlidingPanel.findViewById(R.id.restaurantAddress), restaurant.getAddress());
-
-            Log.d(TAG, restaurant.getAddress());
-
-            //Показываем пользователю какие блага есть в ресторани (там парковочка бесплатная, wi-fi, оплата картой)
-            if (restaurant.getCardPaymentPresent()) {
-                Log.d(TAG, String.valueOf(restaurant.getCardPaymentPresent()));
-                setRestaurantPresentParam(viewSlidingPanel.findViewById(R.id.carParking));
-            }
-
-            if (restaurant.getWifiPresent()) {
-                Log.d(TAG, String.valueOf(restaurant.getWifiPresent()));
-                setRestaurantPresentParam(viewSlidingPanel.findViewById(R.id.wifi));
-            }
-
-            if (restaurant.getParkingPresent()) {
-                Log.d(TAG, String.valueOf(restaurant.getParkingPresent()));
-                setRestaurantPresentParam(viewSlidingPanel.findViewById(R.id.creditCard));
-            }
+            setRestaurantPresentParam(viewSlidingPanel.findViewById(R.id.carParking), restaurant.getCardPaymentPresent());
+            setRestaurantPresentParam(viewSlidingPanel.findViewById(R.id.wifi), restaurant.getWifiPresent());
+            setRestaurantPresentParam(viewSlidingPanel.findViewById(R.id.creditCard), restaurant.getParkingPresent());
         });
     }
 
@@ -100,7 +89,11 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
         textView.setText(text);
     }
 
-    private void setRestaurantPresentParam(ImageView imageView) {
-        DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(imageView.getContext(), R.color.colorSelectItem));
+    private void setRestaurantPresentParam(ImageView imageView, boolean paramStatus) {
+        if (paramStatus) {
+            DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(imageView.getContext(), R.color.colorSelectItem));
+        } else {
+            DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(imageView.getContext(), R.color.colorUnSelectItem));
+        }
     }
 }
