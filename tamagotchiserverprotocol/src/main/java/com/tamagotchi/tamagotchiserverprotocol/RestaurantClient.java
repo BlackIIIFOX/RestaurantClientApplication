@@ -1,5 +1,7 @@
 package com.tamagotchi.tamagotchiserverprotocol;
 
+import android.annotation.SuppressLint;
+
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAccountApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IDishesApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IMenuApiService;
@@ -9,7 +11,15 @@ import com.tamagotchi.tamagotchiserverprotocol.routers.IRestaurantsApiService;
 import com.tamagotchi.tamagotchiserverprotocol.services.AuthenticateInfoService;
 import com.tamagotchi.tamagotchiserverprotocol.services.IAuthenticateInfoService;
 
+import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory;
 import okhttp3.OkHttpClient;
@@ -23,10 +33,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RestaurantClient {
     private static RestaurantClient instance = null;
-    public static final String  BASE_URL = "http://restaurant-tamagotchi.ru:3000/api/";
-
-    private Retrofit retrofit;
-    private OkHttpClient client;
+    public static final String  BASE_URL = "https://restaurant-tamagotchi.ru:3000/api/";
 
     private final IUsersApiService usersServices;
     private final AuthenticateInfoService authenticateInfoService = new AuthenticateInfoService();
@@ -43,7 +50,7 @@ public class RestaurantClient {
         HttpLoggingInterceptor logger = new HttpLoggingInterceptor();
         logger.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
 
-        OkHttpClient client = new OkHttpClient.Builder()
+        OkHttpClient client = generateDefaultOkHttpBuilder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .addInterceptor(chain -> {
@@ -73,6 +80,51 @@ public class RestaurantClient {
         accountService = retrofit.create(IAccountApiService.class);
         dishesService = retrofit.create(IDishesApiService.class);
         menuApiService = retrofit.create(IMenuApiService.class);
+    }
+
+    private static OkHttpClient.Builder generateDefaultOkHttpBuilder() {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        try {
+            // Create a trust manager that does not validate certificate chains
+            final TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        @SuppressLint("TrustAllX509TrustManager")
+                        @Override
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                        }
+
+                        @SuppressLint("TrustAllX509TrustManager")
+                        @Override
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                        }
+
+                        @Override
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new java.security.cert.X509Certificate[]{};
+                        }
+                    }
+            };
+
+            // Install the all-trusting trust manager
+            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            // Create an ssl socket factory with our all-trusting manager
+            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+
+            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
+            builder.hostnameVerifier(new HostnameVerifier() {
+                @SuppressLint("BadHostnameVerifier")
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return builder;
     }
 
     public synchronized static RestaurantClient getInstance() {
