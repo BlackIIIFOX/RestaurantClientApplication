@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 
 public class SlidingPanelFragment extends Fragment {
 
+    private static final String TAG = "SlidingPanelFragment";
     private MainViewModel viewModel;
     private View viewSlidingPanel;
 
@@ -39,6 +41,9 @@ public class SlidingPanelFragment extends Fragment {
 
     private void initVisitInfo() {
         viewModel.getOrderVisitInfo().observe(getViewLifecycleOwner(), orderVisitInfo -> {
+
+            Log.d(TAG, String.valueOf(orderVisitInfo.getNumberOfVisitors()));
+
             setTextInTextView(viewSlidingPanel.findViewById(R.id.restaurantAddress), String.valueOf(orderVisitInfo.getNumberOfVisitors()));
 
             //TODO: Надежды нет, везде добавить проверку и потом добавить дату и время
@@ -53,16 +58,21 @@ public class SlidingPanelFragment extends Fragment {
             // Вот мы его и получили, дальше можно с ним работать.
             setTextInTextView(viewSlidingPanel.findViewById(R.id.restaurantAddress), restaurant.getAddress());
 
+            Log.d(TAG, restaurant.getAddress());
+
             //Показываем пользователю какие блага есть в ресторани (там парковочка бесплатная, wi-fi, оплата картой)
             if (restaurant.getCardPaymentPresent()) {
+                Log.d(TAG, String.valueOf(restaurant.getCardPaymentPresent()));
                 setRestaurantPresentParam(viewSlidingPanel.findViewById(R.id.carParking));
             }
 
             if (restaurant.getWifiPresent()) {
+                Log.d(TAG, String.valueOf(restaurant.getWifiPresent()));
                 setRestaurantPresentParam(viewSlidingPanel.findViewById(R.id.wifi));
             }
 
             if (restaurant.getParkingPresent()) {
+                Log.d(TAG, String.valueOf(restaurant.getParkingPresent()));
                 setRestaurantPresentParam(viewSlidingPanel.findViewById(R.id.creditCard));
             }
         });

@@ -6,16 +6,20 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -30,15 +34,20 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.Result;
+import com.tamagotchi.restaurantclientapplication.ui.main.MainActivity;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
+import com.tamagotchi.restaurantclientapplication.ui.menu.MenuFragment;
+import com.tamagotchi.restaurantclientapplication.ui.slidingpanel.SlidingPanelFragment;
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class RestaurantsFragment extends Fragment implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMarkerClickListener {
 
@@ -213,16 +222,51 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        //View selectedMarker = LayoutInflater.from(this.requireContext()).inflate(R.layout.sliding_panel_restaurant, requireView().findViewById(R.id.PanelRestaurantContainer));
-
         // Получаем выбранный ресторан и устанавливаем его в ViewModel
         RestaurantModel currentRestaurant = (RestaurantModel) marker.getTag();
         viewModel.setSelectedRestaurant(currentRestaurant);
 
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(RestaurantsFragment.this.requireActivity(), R.style.BottomSheetDialogTheme);
         View bottomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.fragment_sliding_panel, (LinearLayout) requireView().findViewById(R.id.panelRestaurantContainer));
+
+        viewModel.getOrderVisitInfo().observe(getViewLifecycleOwner(), orderVisitInfo -> {
+            setTextInTextView(bottomSheetView.findViewById(R.id.restaurantAddress), String.valueOf(orderVisitInfo.getNumberOfVisitors()));
+            //TODO: Надежды нет, везде добавить проверку и потом добавить дату и время
+        });
+
+        viewModel.getSelectedRestaurant().observe(getViewLifecycleOwner(), restaurant -> {
+            // Вот мы его и получили, дальше можно с ним работать.
+            setTextInTextView(bottomSheetView.findViewById(R.id.restaurantAddress), restaurant.getAddress());
+
+            //Показываем пользователю какие блага есть в ресторани (там парковочка бесплатная, wi-fi, оплата картой)
+                setRestaurantPresentParam(bottomSheetView.findViewById(R.id.carParking), restaurant.getCardPaymentPresent());
+                setRestaurantPresentParam(bottomSheetView.findViewById(R.id.wifi), restaurant.getWifiPresent());
+                setRestaurantPresentParam(bottomSheetView.findViewById(R.id.creditCard), restaurant.getParkingPresent());
+        });
+
+        bottomSheetView.findViewById(R.id.buttonMakeOrder).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, new MenuFragment()).commit();
+                bottomSheetDialog.dismiss();
+            }
+        });
+
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
+
         return true;
+    }
+
+    private void setTextInTextView(TextView textView, String text) {
+        textView.setText(text);
+    }
+
+    private void setRestaurantPresentParam(ImageView imageView, boolean activParam) {
+        if (activParam) {
+            DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(imageView.getContext(), R.color.colorSelectItem));
+        } else {
+            DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(imageView.getContext(), R.color.colorUnSelectItem));
+        }
     }
 }
