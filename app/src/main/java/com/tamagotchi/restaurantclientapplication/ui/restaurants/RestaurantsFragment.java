@@ -127,7 +127,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
                 return;
             }
 
-            //getDeviceLocation(); //TODO: Потом убрать коментарий, сейчас пусть просто наводит на Питер
+            getDeviceLocation();
 
             if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -226,11 +226,8 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         RestaurantModel currentRestaurant = (RestaurantModel) marker.getTag();
         viewModel.setSelectedRestaurant(currentRestaurant);
 
-        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(RestaurantsFragment.this.requireActivity(), R.style.BottomSheetDialogTheme);
-        View bottomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.fragment_sliding_panel, (LinearLayout) requireView().findViewById(R.id.panelRestaurantContainer));
-
-        bottomSheetDialog.setContentView(bottomSheetView);
-        bottomSheetDialog.show();
+        SlidingPanelFragment slidingPanelFragment = SlidingPanelFragment.newInstance();
+        slidingPanelFragment.show(requireActivity().getSupportFragmentManager(), "");
 
         return true;
     }

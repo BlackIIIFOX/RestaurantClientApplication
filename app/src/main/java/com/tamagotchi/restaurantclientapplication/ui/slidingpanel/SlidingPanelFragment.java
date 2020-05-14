@@ -10,6 +10,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,19 +20,24 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 
-public class SlidingPanelFragment extends Fragment {
+public class SlidingPanelFragment extends BottomSheetDialogFragment {
 
     private static final String TAG = "SlidingPanelFragment";
     private MainViewModel viewModel;
     private View viewSlidingPanel;
 
+    public static SlidingPanelFragment newInstance() {
+        return new SlidingPanelFragment();
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
+        viewModel = new ViewModelProvider((ViewModelStoreOwner) this, new MainViewModelFactory()).get(MainViewModel.class);
         viewSlidingPanel = inflater.inflate(R.layout.fragment_sliding_panel, container, false);
 
         initVisitInfo();
