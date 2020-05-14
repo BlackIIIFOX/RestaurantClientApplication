@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
+import com.tamagotchi.restaurantclientapplication.ui.main.Navigation;
 
 public class SlidingPanelFragment extends BottomSheetDialogFragment {
 
@@ -42,8 +44,17 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
 
         initVisitInfo();
         initSelectedRestaurant();
+        initNextStep();
 
         return viewSlidingPanel;
+    }
+
+    private void initNextStep() {
+        Button makeOrder = viewSlidingPanel.findViewById(R.id.buttonMakeOrder);
+        makeOrder.setOnClickListener((view) -> {
+            viewModel.setSelectedNavigation(Navigation.Menu);
+        });
+
     }
 
     private void initVisitInfo() {

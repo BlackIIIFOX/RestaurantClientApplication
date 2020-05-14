@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.ui.menu.MenuFragment;
@@ -35,17 +36,48 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private MenuFragment menuFragment = new MenuFragment();
     private OrdersFragment ordersFragment = new OrdersFragment();
     private StillFragment stillFragment = new StillFragment();
+    private MainViewModel viewModel;
+    private Navigation previousNavigation;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
+        InitNavigation();
+    }
 
+    private void InitNavigation() {
         bottomNavigationView = findViewById(R.id.bottom_navigation_view);
-
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
-        bottomNavigationView.setSelectedItemId(R.id.navigation_restaurants);
+
+        // Подписываемся на изменения из ViewModel.
+        viewModel.getSelectedNavigation().observe(this, selectedNavigation -> {
+            if (previousNavigation == selectedNavigation)
+                return;
+
+            switch (selectedNavigation) {
+                case Menu:
+                    bottomNavigationView.setSelectedItemId(R.id.navigation_menu);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, menuFragment).commit();
+                    break;
+                case Order:
+                    bottomNavigationView.setSelectedItemId(R.id.navigation_orders);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, ordersFragment).commit();
+                    break;
+                case Options:
+                    bottomNavigationView.setSelectedItemId(R.id.navigation_still);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, stillFragment).commit();
+                    break;
+                case Restaurant:
+                    bottomNavigationView.setSelectedItemId(R.id.navigation_restaurants);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, restaurantsFragment).commit();
+                    break;
+            }
+
+            previousNavigation = selectedNavigation;
+        });
     }
 
     @Override
@@ -53,20 +85,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         switch (item.getItemId()) {
             case R.id.navigation_restaurants:
                 if (isServicesOK()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, restaurantsFragment).commit();
+                    viewModel.setSelectedNavigation(Navigation.Restaurant);
                 }
                 return true;
 
             case R.id.navigation_menu:
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, menuFragment).commit();
+                viewModel.setSelectedNavigation(Navigation.Menu);
                 return true;
 
             case R.id.navigation_orders:
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, ordersFragment).commit();
+                viewModel.setSelectedNavigation(Navigation.Order);
                 return true;
 
             case R.id.navigation_still:
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, stillFragment).commit();
+                viewModel.setSelectedNavigation(Navigation.Options);
                 return true;
         }
 
@@ -101,8 +133,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     // но для этого надо подключить яндекс кассы (быть ИП или индивидуальным предпринимателем).
                     TokenizationResult result = Checkout.createTokenizationResult(data);
                     result.getPaymentToken();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, stillFragment).commit();
-                    bottomNavigationView.setSelectedItemId(R.id.navigation_still);
+                    viewModel.setSelectedNavigation(Navigation.Options);
                     break;
                 case RESULT_CANCELED:
                     // user canceled tokenization

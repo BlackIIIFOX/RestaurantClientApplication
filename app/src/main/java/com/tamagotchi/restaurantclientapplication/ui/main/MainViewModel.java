@@ -23,6 +23,11 @@ public class MainViewModel extends ViewModel {
     private RestaurantsRepository restaurantsRepository;
 
     /**
+     * Выбранный элемент навигации приложения (нижняя панель)
+     */
+    private MutableLiveData<Navigation> selectedNavigation = new MutableLiveData<>(Navigation.Restaurant);
+
+    /**
      * Все ресторы в системе.
      */
     private MutableLiveData<Result<List<RestaurantModel>>> restaurants = new MutableLiveData<>();
@@ -79,5 +84,22 @@ public class MainViewModel extends ViewModel {
                             this.restaurants.setValue(new Result.Error(new Exception(error)));
                         }
                 );
+    }
+
+    /**
+     * Установить текущую навигацию приложения.
+     * @param navigation выбранный элемент меню.
+     */
+    public void setSelectedNavigation(Navigation navigation) {
+        selectedNavigation.setValue(navigation);
+    }
+
+    /**
+     * Возвращает observable на выбранный пользователем элемент навигации.
+     * Используется для обработки переключения навигации.
+     * @return observable
+     */
+    public LiveData<Navigation> getSelectedNavigation() {
+        return selectedNavigation;
     }
 }
