@@ -1,62 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
  <LinearLayout
+    android:id="@+id/panelRestaurantContainer"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/panelRestaurantContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/sliding_panel_background"
+    android:background="@color/colorWhite"
     android:orientation="vertical"
-    tools:context=".ui.slidingpanel.SlidingPanelFragment">
+    tools:context=".ui.slidingpanel.SlidingPanelFragment" >
 
     <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="20dp">
-
-            <TextView
-                android:id="@+id/selector"
-                android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:background="@color/colorSelectItem"
-                android:gravity="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
-
-            <ImageView
-                android:id="@+id/horizontalPoints"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center_horizontal"
-                android:scaleType="center"
-                android:src="@drawable/ic_horizontal_points"
-                app:itemIconTint="@color/colorWhite" />
-        </FrameLayout>
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:background="@color/colorSelectItem">
+        <ImageView
+            android:id="@+id/horizontalPoints"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_horizontal_points"
+            app:itemIconTint="@color/colorWhite" />
+    </FrameLayout>
 
     <TextView
-            android:id="@+id/galleryListView"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:background="#E4DD95"
-            android:gravity="center"
-            android:padding="15dp"
-            android:text="Gallery ListView or LinerLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
-
-    <View
-            android:id="@+id/galleryDownView"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorDivider"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/galleryListView"
-            />
+        android:id="@+id/galleryListView"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="#E4DD95"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="Gallery ListView or LinerLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -67,9 +44,9 @@
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:padding="5dp"
-            android:src="@drawable/ic_building"
             android:layout_marginEnd="5dp"
-            />
+            android:src="@drawable/ic_building"
+            android:background="@color/colorWhite" />
 
         <TextView
             android:id="@+id/restaurantAddress"
@@ -78,7 +55,7 @@
             android:paddingTop="14dp"
             android:paddingBottom="14dp"
             android:layout_gravity="center"
-            android:text="Address"
+            android:text="@string/none"
             android:textSize="15sp"/>
 
     </LinearLayout>
@@ -88,15 +65,25 @@
         android:layout_height="50dp"
         android:orientation="horizontal">
 
+        <ImageButton
+            android:id="@+id/buttonVisitDate"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:padding="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_calendar"
+            android:layout_marginEnd="5dp"
+            android:background="@color/colorWhite" />
+
         <TextView
+            android:id="@+id/textVisitDate"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="#D9B2E1"
-            android:gravity="center"
-            android:padding="15dp"
-            android:text="18.05.2021"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            android:layout_height="match_parent"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:layout_gravity="center"
+            android:text="@string/testDate"
+            android:textSize="15sp"/>
 
     </LinearLayout>
 
@@ -105,15 +92,25 @@
         android:layout_height="50dp"
         android:orientation="horizontal">
 
+        <ImageButton
+            android:id="@+id/buttonVisitTime"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:padding="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_access_time"
+            android:layout_marginEnd="5dp"
+            android:background="@color/colorWhite" />
+
         <TextView
+            android:id="@+id/textVisitTime"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="#95C4E4"
-            android:gravity="center"
-            android:padding="15dp"
-            android:text="15:00-17:00"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            android:layout_height="match_parent"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:layout_gravity="center"
+            android:text="@string/testTime"
+            android:textSize="15sp"/>
 
     </LinearLayout>
 

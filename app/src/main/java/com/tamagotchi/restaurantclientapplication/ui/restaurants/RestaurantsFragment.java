@@ -121,19 +121,19 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         mMap = googleMap;
         updateMap();
 
-        if (mLocationPermissionsGranted) {
-            if (!isGeoEnabled()) {
+        if (mLocationPermissionsGranted) { //TODO: Тестовая версия, раскоментить в релизе
+//            if (!isGeoEnabled()) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.9386300, 30.3141300), 10f));
-                return;
-            }
-
-            getDeviceLocation();
-
-            if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            mMap.setMyLocationEnabled(true);
+//                return;
+//            }
+//
+//            getDeviceLocation();
+//
+//            if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+//                    && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                return;
+//            }
+//            mMap.setMyLocationEnabled(true);
         }
     }
 

@@ -28,4 +28,7 @@
     <string name="makeOrder">Сделать заказ</string>
     <string name="numberOfGuests">Количество гостей:</string>
     <string name="make_payment">Опатить</string>
+    <string name="none">None</string>
+    <string name="testDate">00.00.0000</string>
+    <string name="testTime">00:00</string>
 </resources>

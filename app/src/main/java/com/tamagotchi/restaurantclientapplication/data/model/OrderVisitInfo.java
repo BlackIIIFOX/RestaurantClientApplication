@@ -23,7 +23,15 @@ public class OrderVisitInfo {
         return visitTime;
     }
 
+    public void setVisitTime(Calendar visitTime) {
+        this.visitTime = visitTime;
+    }
+
     public int getNumberOfVisitors() {
         return numberOfVisitors;
+    }
+
+    public void setNumberOfVisitors(int numberOfVisitors) {
+        this.numberOfVisitors = numberOfVisitors;
     }
 }
