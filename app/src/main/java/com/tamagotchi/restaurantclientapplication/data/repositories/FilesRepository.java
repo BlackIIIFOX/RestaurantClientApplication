@@ -38,7 +38,7 @@ public class FilesRepository {
 
     public Single<Bitmap> getImageById(int id) {
         try {
-            URL url = new URL("http:/restaurant-tamagotchi.ru:3000/api/files/" + id);
+            URL url = new URL("https://restaurant-tamagotchi.ru:3000/api/files/" + id);
             Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
             return Single.just(bmp);
         } catch (Exception e) {
