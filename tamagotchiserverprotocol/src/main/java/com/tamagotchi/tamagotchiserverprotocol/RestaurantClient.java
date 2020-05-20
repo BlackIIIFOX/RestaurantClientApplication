@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAccountApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IDishesApiService;
+import com.tamagotchi.tamagotchiserverprotocol.routers.IFilesApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IMenuApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IUsersApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAuthenticateApiService;
@@ -42,6 +43,7 @@ public class RestaurantClient {
     private final IAccountApiService accountService;
     private final IDishesApiService dishesService;
     private final IMenuApiService menuApiService;
+    private final IFilesApiService filesApiService;
 
     /**
      * Инициализация retrofit клиента.
@@ -80,6 +82,7 @@ public class RestaurantClient {
         accountService = retrofit.create(IAccountApiService.class);
         dishesService = retrofit.create(IDishesApiService.class);
         menuApiService = retrofit.create(IMenuApiService.class);
+        filesApiService = retrofit.create(IFilesApiService.class);
     }
 
     private static OkHttpClient.Builder generateDefaultOkHttpBuilder() {
@@ -188,4 +191,10 @@ public class RestaurantClient {
      * @return /api/dishes
      */
     public IMenuApiService getMenuService() { return menuApiService; }
+
+    /**
+     * Предосталвяет сервис для работы с файлами.
+     * @return /api/files
+     */
+    public IFilesApiService getFilesApiService() { return filesApiService; }
 }

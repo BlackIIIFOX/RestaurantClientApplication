@@ -38,6 +38,9 @@ import com.tamagotchi.restaurantclientapplication.ui.main.Navigation;
 import java.util.Calendar;
 import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class SlidingPanelFragment extends BottomSheetDialogFragment {
 
     private static final String TAG = "SlidingPanelFragment";
@@ -59,7 +62,7 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        viewModel = new ViewModelProvider((ViewModelStoreOwner) this, new MainViewModelFactory()).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
         viewSlidingPanel = inflater.inflate(R.layout.fragment_sliding_panel, container, false);
 
         initVisitInfo();
@@ -92,16 +95,22 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
             //TODO: Сделано не очень красиво, но пока как решение пойдет
             FilesRepository filesRepository = FilesRepository.getInstance();
 
-            LinearLayout galleryItemLayout = (LinearLayout) viewSlidingPanel.findViewById(R.id.galleryItem);
-            List<Integer> photos = restaurant.getPhotos();
+            LinearLayout galleryItemLayout = viewSlidingPanel.findViewById(R.id.galleryItem);
 
-            for (int i = 0; i < photos.size(); i++) {
-                ImageView imageView = new ImageView(requireContext());
-                imageView.setId(i);
-                imageView.setPadding(2, 2, 2, 2);
-                imageView.setImageBitmap(filesRepository.getImageById(photos.get(i)).blockingGet());
-                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                galleryItemLayout.addView(imageView);
+            for (Integer photoId : restaurant.getPhotos()) {
+                filesRepository.getImageById(photoId)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(image -> {
+                            ImageView imageView = new ImageView(requireContext());
+                            imageView.setId(photoId);
+                            imageView.setPadding(2, 2, 2, 2);
+                            imageView.setImageBitmap(image);
+                            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                            galleryItemLayout.addView(imageView);
+                        }, error -> {
+
+                        });
             }
 
             setTextInTextView(viewSlidingPanel.findViewById(R.id.restaurantAddress), restaurant.getAddress());
@@ -159,7 +168,7 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
             OrderVisitInfo orderVisitInfo = viewModel.getOrderVisitInfo().getValue();
             int numberOfVisitors = orderVisitInfo.getNumberOfVisitors() - 1;
             if (numberOfVisitors < 1) {
-                Toast.makeText(requireContext(),"Cannot be less than 1", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Cannot be less than 1", Toast.LENGTH_SHORT).show();
             } else {
                 orderVisitInfo.setNumberOfVisitors(numberOfVisitors);
                 setTextInTextView(viewSlidingPanel.findViewById(R.id.countGuest), String.valueOf(numberOfVisitors));
@@ -187,7 +196,7 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
                         calendar = tmpDate;
                         setInitialDateTime();
                     } else {
-                        Toast.makeText(requireContext(),"Too early...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Too early...", Toast.LENGTH_SHORT).show();
                     }
                 }
             };
@@ -217,7 +226,7 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
                         calendar = tmpTime;
                         setInitialDateTime();
                     } else {
-                        Toast.makeText(requireContext(),"Too early...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Too early...", Toast.LENGTH_SHORT).show();
                     }
                 }
             };

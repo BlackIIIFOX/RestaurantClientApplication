@@ -43,7 +43,7 @@ public class BootstrapService {
         RestaurantsRepository.InitializeService(client.getRestaurantsService());
         DishesRepository.InitializeService(client.getDishesService());
         MenuRepository.InitializeService(client.getMenuService());
-        FilesRepository.InitializeService();
+        FilesRepository.InitializeService(client.getFilesApiService());
 
         OrderManager.InitializeService(RestaurantsRepository.getInstance());
 

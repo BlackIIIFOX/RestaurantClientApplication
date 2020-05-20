@@ -6,12 +6,14 @@ import android.graphics.BitmapFactory;
 import com.tamagotchi.restaurantclientapplication.Application;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IDishesApiService;
+import com.tamagotchi.tamagotchiserverprotocol.routers.IFilesApiService;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.http.Url;
 
 public class FilesRepository {
@@ -19,9 +21,11 @@ public class FilesRepository {
 
     // private IDishesApiService dishesApiService;
     private static final Object syncInstance = new Object();
+    private IFilesApiService filesApiService;
 
     // private constructor : singleton access
-    private FilesRepository() {
+    private FilesRepository(IFilesApiService filesApiService) {
+        this.filesApiService = filesApiService;
     }
 
     public static FilesRepository getInstance() {
@@ -30,19 +34,15 @@ public class FilesRepository {
         }
     }
 
-    public static void InitializeService() {
+    public static void InitializeService(IFilesApiService filesApiService) {
         synchronized (syncInstance) {
-            instance = new FilesRepository();
+            instance = new FilesRepository(filesApiService);
         }
     }
 
     public Single<Bitmap> getImageById(int id) {
-        try {
-            URL url = new URL("https://restaurant-tamagotchi.ru:3000/api/files/" + id);
-            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            return Single.just(bmp);
-        } catch (Exception e) {
-            return Single.error(new Exception(e.getMessage()));
-        }
+        // TODO: добавить кеширование.
+        return this.filesApiService.downloadFileWithDynamicUrlSync("https://restaurant-tamagotchi.ru:3000/api/files/" + id)
+        .map(responseBody -> BitmapFactory.decodeStream(responseBody.byteStream()));
     }
 }
