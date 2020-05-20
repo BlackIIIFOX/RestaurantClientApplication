@@ -1,20 +1,18 @@
 package com.tamagotchi.restaurantclientapplication.ui.slidingpanel;
 
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelStoreOwner;
 
 import android.util.Log;
@@ -23,8 +21,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -32,11 +30,13 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.model.OrderVisitInfo;
+import com.tamagotchi.restaurantclientapplication.data.repositories.FilesRepository;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 import com.tamagotchi.restaurantclientapplication.ui.main.Navigation;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class SlidingPanelFragment extends BottomSheetDialogFragment {
 
@@ -89,6 +89,21 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
 
     private void initSelectedRestaurant() {
         viewModel.getSelectedRestaurant().observe(getViewLifecycleOwner(), restaurant -> {
+            //TODO: Сделано не очень красиво, но пока как решение пойдет
+            FilesRepository filesRepository = FilesRepository.getInstance();
+
+            LinearLayout galleryItemLayout = (LinearLayout) viewSlidingPanel.findViewById(R.id.galleryItem);
+            List<Integer> photos = restaurant.getPhotos();
+
+            for (int i = 0; i < photos.size(); i++) {
+                ImageView imageView = new ImageView(requireContext());
+                imageView.setId(i);
+                imageView.setPadding(2, 2, 2, 2);
+                imageView.setImageBitmap(filesRepository.getImageById(photos.get(i)).blockingGet());
+                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                galleryItemLayout.addView(imageView);
+            }
+
             setTextInTextView(viewSlidingPanel.findViewById(R.id.restaurantAddress), restaurant.getAddress());
             setRestaurantPresentParam(viewSlidingPanel.findViewById(R.id.carParking), restaurant.getCardPaymentPresent());
             setRestaurantPresentParam(viewSlidingPanel.findViewById(R.id.wifi), restaurant.getWifiPresent());
@@ -153,59 +168,62 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
     }
 
     private void updateVisitDate() {
-        AppCompatImageButton button = viewSlidingPanel.findViewById(R.id.buttonVisitDate);
-        button.setOnClickListener((view) -> {
-            new DatePickerDialog(requireContext(), d, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+        AppCompatImageButton datePickerDialogButton = viewSlidingPanel.findViewById(R.id.buttonVisitDate);
+
+        datePickerDialogButton.setOnClickListener(view -> {
+            DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
+                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                    Calendar tmpVisitTime = Calendar.getInstance();
+                    Calendar tmpDate = calendar;
+
+                    view.setMinDate(calendar.getTimeInMillis());
+
+                    tmpDate.set(Calendar.YEAR, year);
+                    tmpDate.set(Calendar.MONTH, monthOfYear);
+                    tmpDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+
+                    if (!tmpVisitTime.after(tmpDate)) {
+                        calendar = tmpDate;
+                        setInitialDateTime();
+                    } else {
+                        Toast.makeText(requireContext(),"Too early...", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            };
+
+            Calendar tmpVisitTime = Calendar.getInstance();
+            DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), onDateSetListener, tmpVisitTime.get(Calendar.YEAR), tmpVisitTime.get(Calendar.MONTH), tmpVisitTime.get(Calendar.DAY_OF_MONTH));
+            datePickerDialog.getDatePicker().setMinDate(tmpVisitTime.getTimeInMillis());
+            datePickerDialog.show();
         });
     }
 
     private void updateVisitTime() {
-        AppCompatImageButton button = viewSlidingPanel.findViewById(R.id.buttonVisitTime);
-        button.setOnClickListener((view) -> {
-            new TimePickerDialog(requireContext(), t, calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE), true).show();
+        AppCompatImageButton timePickerDialogButton = viewSlidingPanel.findViewById(R.id.buttonVisitTime);
+
+        timePickerDialogButton.setOnClickListener(view -> {
+            TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    Calendar tmpVisitTime = Calendar.getInstance();
+                    Calendar tmpTime = calendar;
+
+                    tmpVisitTime.add(Calendar.MINUTE, 30);
+
+                    tmpTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    tmpTime.set(Calendar.MINUTE, minute);
+
+                    if (tmpVisitTime.before(tmpTime)) {
+                        calendar = tmpTime;
+                        setInitialDateTime();
+                    } else {
+                        Toast.makeText(requireContext(),"Too early...", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            };
+
+            TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(), onTimeSetListener, calendar.getTime().getHours(), calendar.getTime().getMinutes(), true);
+            timePickerDialog.show();
         });
     }
-
-    TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
-        @Override
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            Calendar tmpVisitTime = Calendar.getInstance();
-            Calendar tmpTime = calendar;
-
-            tmpVisitTime.add(Calendar.MINUTE, 30);
-
-            tmpTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            tmpTime.set(Calendar.MINUTE, minute);
-
-            if (tmpVisitTime.before(tmpTime)) {
-                calendar = tmpTime;
-                setInitialDateTime();
-            } else {
-                Toast.makeText(requireContext(),"Too early...", Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
-
-    DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
-        @Override
-        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            Calendar tmpVisitTime = Calendar.getInstance();
-            Calendar tmpDate = calendar;
-
-            tmpDate.set(Calendar.YEAR, year);
-            tmpDate.set(Calendar.MONTH, monthOfYear);
-            tmpDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-
-            if (!tmpVisitTime.after(tmpDate)) {
-                calendar = tmpDate;
-                setInitialDateTime();
-            } else {
-                Toast.makeText(requireContext(),"Too early...", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, tmpVisitTime.toString());
-                Log.d(TAG, tmpDate.toString());
-                Log.d(TAG, calendar.toString());
-            }
-        }
-    };
 }
