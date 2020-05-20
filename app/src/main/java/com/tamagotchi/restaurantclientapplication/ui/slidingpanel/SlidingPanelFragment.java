@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -96,6 +98,8 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
             FilesRepository filesRepository = FilesRepository.getInstance();
 
             LinearLayout galleryItemLayout = viewSlidingPanel.findViewById(R.id.galleryItem);
+            int photoHeight = viewSlidingPanel.findViewById(R.id.RestaurantGallery).getLayoutParams().height;
+            int photoWidth = (int) (photoHeight * 1.25);
 
             for (Integer photoId : restaurant.getPhotos()) {
                 filesRepository.getImageById(photoId)
@@ -104,13 +108,27 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
                         .subscribe(image -> {
                             ImageView imageView = new ImageView(requireContext());
                             imageView.setId(photoId);
-                            imageView.setPadding(2, 2, 2, 2);
-                            imageView.setImageBitmap(image);
+                            imageView.setPadding(5, 5, 5, 5);
+                            imageView.setLayoutParams(new ViewGroup.LayoutParams(photoWidth,photoHeight));
                             imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                            imageView.setImageBitmap(image);
                             galleryItemLayout.addView(imageView);
                         }, error -> {
-
+                            ImageView imageView = new ImageView(requireContext());
+                            imageView.setId(photoId);
+                            imageView.setPadding(5, 5, 5, 5);
+                            imageView.setLayoutParams(new ViewGroup.LayoutParams(photoWidth,photoHeight));
+                            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                            imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_photo));
+                            galleryItemLayout.addView(imageView);
                         });
+            }
+
+            if (restaurant.getPhotos().size() == 0) {
+                HorizontalScrollView horizontalScrollView = viewSlidingPanel.findViewById(R.id.RestaurantGallery);
+                HorizontalScrollView.LayoutParams params = (HorizontalScrollView.LayoutParams) horizontalScrollView.getLayoutParams();
+                params.height = 0;
+                horizontalScrollView.setLayoutParams(params);
             }
 
             setTextInTextView(viewSlidingPanel.findViewById(R.id.restaurantAddress), restaurant.getAddress());
