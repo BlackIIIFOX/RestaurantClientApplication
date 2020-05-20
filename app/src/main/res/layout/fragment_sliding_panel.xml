@@ -28,15 +28,15 @@
         android:id="@+id/RestaurantGallery"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:padding="15dp"
-        android:background="#E4DD95" >
+        android:padding="7dp"
+        android:background="@color/colorWhite"
+        android:gravity="center">
 
         <LinearLayout
             android:id="@+id/galleryItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="#A4FDFF"/>
+            android:orientation="horizontal"/>
 
     </HorizontalScrollView>
 
@@ -145,40 +145,48 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="175dp"
+            android:layout_width="200dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="50dp"
             android:paddingTop="15dp"
             android:paddingBottom="15dp"
-            android:paddingStart="5dp"
+            android:paddingStart="55dp"
             android:text="@string/numberOfGuests"
             android:textSize="15sp" />
 
-        <ImageButton
-            android:id="@+id/removeGuest"
-            android:layout_width="30dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="46dp"
-            android:background="@color/colorWhite"
-            android:gravity="center"
-            android:src="@drawable/ic_remove_circle"/>
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:paddingEnd="30dp"
+            tools:ignore="RtlSymmetry">
 
-        <TextView
-            android:id="@+id/countGuest"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="1"
-            android:textSize="15sp" />
+            <ImageButton
+                android:id="@+id/removeGuest"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="46dp"
+                android:background="@color/colorWhite"
+                android:gravity="center"
+                android:src="@drawable/ic_remove_circle"/>
 
-        <ImageButton
-            android:id="@+id/addGuest"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:background="@color/colorWhite"
-            android:gravity="center"
-            android:src="@drawable/ic_add_circle"/>
+            <TextView
+                android:id="@+id/countGuest"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="1"
+                android:textSize="15sp" />
 
+            <ImageButton
+                android:id="@+id/addGuest"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorWhite"
+                android:gravity="center"
+                android:src="@drawable/ic_add_circle"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -199,35 +207,45 @@
             android:textColor="@color/colorWhite"
             android:textSize="15sp" />
 
-        <ImageView
-            android:id="@+id/wifi"
-            android:layout_height="30dp"
-            android:layout_width="30dp"
-            android:scaleType="centerCrop"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginStart="60dp"
-            android:src="@drawable/ic_wifi" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:paddingEnd="20dp"
+            tools:ignore="RtlSymmetry">
 
-        <ImageView
-            android:id="@+id/carParking"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:scaleType="centerCrop"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginStart="20dp"
-            android:src="@drawable/ic_car_parking" />
+            <ImageView
+                android:id="@+id/wifi"
+                android:layout_height="30dp"
+                android:layout_width="30dp"
+                android:scaleType="centerCrop"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="60dp"
+                android:src="@drawable/ic_wifi" />
 
-        <ImageView
-            android:id="@+id/creditCard"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:scaleType="centerCrop"
-            android:layout_marginTop="11dp"
-            android:layout_marginBottom="9dp"
-            android:layout_marginStart="20dp"
-            android:src="@drawable/ic_credit_card" />
+            <ImageView
+                android:id="@+id/carParking"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:scaleType="centerCrop"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/ic_car_parking" />
+
+            <ImageView
+                android:id="@+id/creditCard"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:scaleType="centerCrop"
+                android:layout_marginTop="11dp"
+                android:layout_marginBottom="9dp"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/ic_credit_card" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
