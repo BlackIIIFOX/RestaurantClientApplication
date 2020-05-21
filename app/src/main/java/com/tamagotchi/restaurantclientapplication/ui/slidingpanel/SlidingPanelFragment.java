@@ -42,21 +42,12 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class SlidingPanelFragment extends BottomSheetDialogFragment {
 
     private static final String TAG = "SlidingPanelFragment";
-    private static SlidingPanelFragment slidingPanelFragment;
+
     private static SimpleDateFormat dataFormat = new SimpleDateFormat("dd.MM.yyyy");
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("kk:mm");
     private static Calendar calendar;
     private MainViewModel viewModel;
     private View viewSlidingPanel;
-
-    public static SlidingPanelFragment newInstance() {
-        if (slidingPanelFragment != null) {
-            return slidingPanelFragment;
-        } else {
-            slidingPanelFragment = new SlidingPanelFragment();
-            return slidingPanelFragment;
-        }
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -150,7 +141,7 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
         Button makeOrder = viewSlidingPanel.findViewById(R.id.buttonMakeOrder);
         makeOrder.setOnClickListener((view) -> {
             viewModel.setSelectedNavigation(Navigation.Menu);
-            slidingPanelFragment.dismiss();
+            this.dismiss();
         });
     }
 
