@@ -34,9 +34,12 @@ import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 import com.tamagotchi.restaurantclientapplication.ui.main.Navigation;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class SlidingPanelFragment extends BottomSheetDialogFragment {
@@ -48,6 +51,7 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
     private static Calendar calendar;
     private MainViewModel viewModel;
     private View viewSlidingPanel;
+    private List<Disposable> listImagesDownloadSubscribers = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -60,6 +64,17 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
         updateVisitInfo();
 
         return viewSlidingPanel;
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        for (Disposable subscriber:
+             this.listImagesDownloadSubscribers) {
+            subscriber.dispose();
+        }
     }
 
     private void initVisitInfo() {
@@ -89,7 +104,7 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
             int photoWidth = (int) (photoHeight * 1.25);
 
             for (Integer photoId : restaurant.getPhotos()) {
-                filesRepository.getImageById(photoId)
+                Disposable subscriber = filesRepository.getImageById(photoId)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
                         .subscribe(image -> {
@@ -109,6 +124,8 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
                             imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_photo));
                             galleryItemLayout.addView(imageView);
                         });
+
+                listImagesDownloadSubscribers.add(subscriber);
             }
 
             if (restaurant.getPhotos().size() == 0) {
