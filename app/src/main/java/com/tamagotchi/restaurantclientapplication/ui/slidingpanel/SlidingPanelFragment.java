@@ -7,16 +7,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelStoreOwner;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +35,6 @@ import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 import com.tamagotchi.restaurantclientapplication.ui.main.Navigation;
 
 import java.util.Calendar;
-import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -46,21 +42,12 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class SlidingPanelFragment extends BottomSheetDialogFragment {
 
     private static final String TAG = "SlidingPanelFragment";
-    private static SlidingPanelFragment slidingPanelFragment;
+
     private static SimpleDateFormat dataFormat = new SimpleDateFormat("dd.MM.yyyy");
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("kk:mm");
     private static Calendar calendar;
     private MainViewModel viewModel;
     private View viewSlidingPanel;
-
-    public static SlidingPanelFragment newInstance() {
-        if (slidingPanelFragment != null) {
-            return slidingPanelFragment;
-        } else {
-            slidingPanelFragment = new SlidingPanelFragment();
-            return slidingPanelFragment;
-        }
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -154,7 +141,7 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
         Button makeOrder = viewSlidingPanel.findViewById(R.id.buttonMakeOrder);
         makeOrder.setOnClickListener((view) -> {
             viewModel.setSelectedNavigation(Navigation.Menu);
-            slidingPanelFragment.dismiss();
+            this.dismiss();
         });
     }
 

@@ -226,7 +226,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         RestaurantModel currentRestaurant = (RestaurantModel) marker.getTag();
         viewModel.setSelectedRestaurant(currentRestaurant);
 
-        SlidingPanelFragment slidingPanelFragment = SlidingPanelFragment.newInstance();
+        SlidingPanelFragment slidingPanelFragment = new SlidingPanelFragment();
         slidingPanelFragment.show(requireActivity().getSupportFragmentManager(), "");
 
         return true;
