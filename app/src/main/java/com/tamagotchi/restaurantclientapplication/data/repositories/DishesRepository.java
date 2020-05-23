@@ -3,7 +3,6 @@ package com.tamagotchi.restaurantclientapplication.data.repositories;
 import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthPasswordException;
 import com.tamagotchi.restaurantclientapplication.data.exceptions.NotFoundException;
 import com.tamagotchi.tamagotchiserverprotocol.models.DishModel;
-import com.tamagotchi.tamagotchiserverprotocol.models.MenuItem;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IDishesApiService;
 
 import java.util.List;
