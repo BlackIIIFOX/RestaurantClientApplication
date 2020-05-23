@@ -39,6 +39,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -51,7 +52,7 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
     private static Calendar calendar;
     private MainViewModel viewModel;
     private View viewSlidingPanel;
-    private List<Disposable> listImagesDownloadSubscribers = new ArrayList<>();
+    private CompositeDisposable listImagesDownloadSubscribers  = new CompositeDisposable();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -71,10 +72,7 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
     public void onDestroyView() {
         super.onDestroyView();
 
-        for (Disposable subscriber:
-             this.listImagesDownloadSubscribers) {
-            subscriber.dispose();
-        }
+        listImagesDownloadSubscribers.dispose();
     }
 
     private void initVisitInfo() {
