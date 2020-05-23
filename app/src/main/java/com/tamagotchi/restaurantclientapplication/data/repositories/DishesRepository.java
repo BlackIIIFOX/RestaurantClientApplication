@@ -69,7 +69,7 @@ public class DishesRepository {
      * @param id id блюда.
      * @return экземпляр блюда.
      */
-    public Single<DishModel> getMenuItemById(int id) {
+    public Single<DishModel> getDishById(int id) {
         return Single.create(source ->
                 this.dishesApiService.getDishById(id)
                         .subscribe(
