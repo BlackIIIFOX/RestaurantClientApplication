@@ -1,6 +1,5 @@
 package com.tamagotchi.tamagotchiserverprotocol.routers;
 
-import com.tamagotchi.tamagotchiserverprotocol.models.DishModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.MenuItem;
 
 import java.util.List;

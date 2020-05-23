@@ -23,35 +23,26 @@ public class DishModel {
     @Expose
     private List<Integer> photos;
 
-    public int getId() {
-        return id;
+    public DishModel(int id, String name, String description, List<Integer> photos) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.photos = photos;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getId() {
+        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public List<Integer> getPhotos() {
         return photos;
-    }
-
-    public void setPhotos(List<Integer> photos) {
-        this.photos = photos;
     }
 }

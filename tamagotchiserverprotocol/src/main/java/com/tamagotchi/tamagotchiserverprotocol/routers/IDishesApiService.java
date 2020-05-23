@@ -21,7 +21,7 @@ public interface IDishesApiService {
      * Get dish by id.
      * @return dish.
      */
-    @GET("restaurants/{id}")
+    @GET("dishes/{id}")
     Single<DishModel> getDishById(@Path("id") Integer id);
 
 }

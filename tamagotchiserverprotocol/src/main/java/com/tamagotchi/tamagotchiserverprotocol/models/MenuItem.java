@@ -19,4 +19,27 @@ public class MenuItem {
     @SerializedName("isDeleted")
     @Expose
     private boolean isDeleted;
+
+    public MenuItem(int id, int price, int dishId, boolean isDeleted) {
+        this.id = id;
+        this.price = price;
+        this.dishId = dishId;
+        this.isDeleted = isDeleted;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public int getDishId() {
+        return dishId;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
 }
