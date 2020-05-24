@@ -69,7 +69,14 @@ public class MainViewModel extends ViewModel {
      */
     private MutableLiveData<Result<List<FullMenuItem>>> selectedRestaurantMenu = new MutableLiveData<>();
 
+    /**
+     * Элементы меню, которые выбрал пользователь.
+     */
+    private MutableLiveData<List<FullMenuItem>> userMenuSubject = new MutableLiveData<>();
+
     private Disposable menuItemRequest = null;
+
+    private List<FullMenuItem> userMenu = new ArrayList<>();
 
     MainViewModel(RestaurantsRepository restaurantsRepository, DishesRepository dishesRepository, MenuRepository menuRepository) {
         this.restaurantsRepository = restaurantsRepository;
@@ -98,6 +105,47 @@ public class MainViewModel extends ViewModel {
         InitRestaurantMenu(restaurant);
     }
 
+    /**
+     * Возвращает observable на элементы меню, которые выбрал пользователь.
+     * @return LiveData меню пользователя.
+     */
+    public LiveData<List<FullMenuItem>> getUserMenu() {
+        return userMenuSubject;
+    }
+
+    /**
+     * Добавить новый элемент меню в пользовательеское меню.
+     * @param menuItem новый элемент меню.
+     */
+    public void addToUserMenu(FullMenuItem menuItem) {
+        userMenu = new ArrayList<>(userMenu);
+        userMenu.add(menuItem);
+        userMenuSubject.setValue(userMenu);
+    }
+
+    /**
+     * Удалить элемент из пользовательского меню.
+     * @param menuItem удаляемый элемент.
+     */
+    public void removeFromUserMenu(FullMenuItem menuItem) {
+        userMenu = new ArrayList<>(userMenu);
+        userMenu.remove(menuItem);
+        userMenuSubject.setValue(userMenu);
+    }
+
+    /**
+     * Очистить меню пользователя.
+     */
+    public void clearUserMenu() {
+        userMenu = new ArrayList<>(userMenu);
+        userMenu.clear();
+        userMenuSubject.setValue(userMenu);
+    }
+
+    /**
+     * Возвращает observable на меню ресторана.
+     * @return LiveData на меню ресторана.
+     */
     public LiveData<Result<List<FullMenuItem>>> getSelectedRestaurantMenu() {
         return selectedRestaurantMenu;
     }
@@ -142,6 +190,9 @@ public class MainViewModel extends ViewModel {
         if (menuItemRequest != null) {
             menuItemRequest.dispose();
         }
+
+        // Очищаем меню пользователя.
+        clearUserMenu();
 
         menuItemRequest = this.menuRepository.getMenu(restaurant.getId())
                 .toObservable()

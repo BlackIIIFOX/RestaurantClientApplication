@@ -1,13 +1,7 @@
 package com.tamagotchi.restaurantclientapplication.services;
 
-import android.app.IntentService;
-import android.app.Service;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.IBinder;
 import android.util.Log;
-
-import androidx.annotation.Nullable;
 
 import com.tamagotchi.restaurantclientapplication.Application;
 import com.tamagotchi.tamagotchiserverprotocol.RestaurantClient;
@@ -24,13 +18,13 @@ public class AuthenticationInfoStorageService {
         }
     }
 
-    public String getToken() {
+    String getToken() {
         String token = Application.getPrefs().getString(TOKEN, "");
         Log.i(TAG, "Token get: " + token);
         return token;
     }
 
-    public void removeToken() {
+    void removeToken() {
         SharedPreferences.Editor edit;
 
         edit = Application.getPrefs().edit();
@@ -39,7 +33,7 @@ public class AuthenticationInfoStorageService {
         edit.apply();
     }
 
-    public void saveToken(String token) {
+    void saveToken(String token) {
         SharedPreferences.Editor edit;
 
         edit = Application.getPrefs().edit();
