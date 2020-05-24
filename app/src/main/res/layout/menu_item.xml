@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/photoItemMenu"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_photo"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/dishName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/name_of_dish"
+                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:layout_margin="5dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/price"
+                    android:layout_margin="5dp"/>
+
+                <TextView
+                    android:id="@+id/dishPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/priceValue"
+                    android:layout_margin="5dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/currency"
+                    android:layout_margin="5dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="@string/quantity"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="end"
+                    android:paddingEnd="30dp"
+                    tools:ignore="RtlSymmetry">
+
+                    <ImageButton
+                        android:id="@+id/removeItemMenu"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="46dp"
+                        android:background="@color/colorWhite"
+                        android:gravity="center"
+                        android:src="@drawable/ic_remove_circle"/>
+
+                    <TextView
+                        android:id="@+id/countItemMenu"
+                        android:layout_width="50dp"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="@string/startItemMenuCount"
+                        android:textSize="15sp" />
+
+                    <ImageButton
+                        android:id="@+id/addItemMenu"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/colorWhite"
+                        android:gravity="center"
+                        android:src="@drawable/ic_add_circle"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/dishDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/description_of_the_dish"
+        android:layout_margin="5dp"/>
+
+</LinearLayout>
