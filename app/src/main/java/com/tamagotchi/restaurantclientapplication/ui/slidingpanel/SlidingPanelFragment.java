@@ -72,9 +72,7 @@ public class SlidingPanelFragment extends BottomSheetDialogFragment {
     public void onDestroyView() {
         super.onDestroyView();
 
-        for (Disposable subscriber: this.listImagesDownloadSubscribers) {
-            subscriber.dispose();
-        }
+        listImagesDownloadSubscribers.dispose();
     }
 
     private void initVisitInfo() {

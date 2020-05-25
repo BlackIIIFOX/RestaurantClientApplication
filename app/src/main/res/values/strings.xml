@@ -17,7 +17,6 @@
     <string name="create_account_error">Не удалось создать аккаунт</string>
     <string name="login_failed">"Авторизация провалена"</string>
     <string name="create_success">"Создание аккаунта успешно. Выполните авторизацию."</string>
-    <string name="title_activity_main">MainActivity</string>
     <string name="title_menu">Меню</string>
     <string name="title_orders">Заказы</string>
     <string name="title_restaurants">Рестораны</string>
