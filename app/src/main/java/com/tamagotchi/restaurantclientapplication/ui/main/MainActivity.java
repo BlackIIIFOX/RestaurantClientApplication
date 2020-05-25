@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -16,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.ui.menu.MenuFragment;
 import com.tamagotchi.restaurantclientapplication.ui.orders.OrdersFragment;
@@ -53,6 +55,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView = findViewById(R.id.bottom_navigation_view);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
+        Menu navigationMenu = bottomNavigationView.getMenu();
+        MenuItem restaurantMenuItem = navigationMenu.getItem(0);
+        MenuItem menuMenuItem = navigationMenu.getItem(1);
+        MenuItem orderMenuItem = navigationMenu.getItem(2);
+        MenuItem optionsMenuItem = navigationMenu.getItem(3);
+
         // Подписываемся на изменения из ViewModel.
         viewModel.getSelectedNavigation().observe(this, selectedNavigation -> {
             if (previousNavigation == selectedNavigation)
@@ -60,18 +68,40 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
             switch (selectedNavigation) {
                 case Menu:
-                    bottomNavigationView.setSelectedItemId(R.id.navigation_menu);
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, menuFragment).commit();
+                    if (checkSelectedRestaurant()) {
+                        //bottomNavigationView.setSelectedItemId(R.id.navigation_menu);
+                        menuMenuItem.setChecked(true);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container, menuFragment).commit();
+                    }
+                    else {
+                        restaurantMenuItem.setChecked(true);
+                        //bottomNavigationView.setSelectedItemId(R.id.navigation_restaurants);
+                        viewModel.setSelectedNavigation(Navigation.Restaurant);
+                        return;
+                    }
+
                     break;
                 case Order:
-                    bottomNavigationView.setSelectedItemId(R.id.navigation_orders);
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, ordersFragment).commit();
+                    if (checkSelectedRestaurant()) {
+                        orderMenuItem.setChecked(true);
+                        bottomNavigationView.setSelectedItemId(R.id.navigation_orders);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container, ordersFragment).commit();
+                    }
+                    else {
+                        restaurantMenuItem.setChecked(true);
+                        //bottomNavigationView.setSelectedItemId(R.id.navigation_restaurants);
+                        viewModel.setSelectedNavigation(Navigation.Restaurant);
+                        return;
+                    }
+
                     break;
                 case Options:
+                    optionsMenuItem.setChecked(true);
                     bottomNavigationView.setSelectedItemId(R.id.navigation_still);
                     getSupportFragmentManager().beginTransaction().replace(R.id.container, stillFragment).commit();
                     break;
                 case Restaurant:
+                    restaurantMenuItem.setChecked(true);
                     bottomNavigationView.setSelectedItemId(R.id.navigation_restaurants);
                     getSupportFragmentManager().beginTransaction().replace(R.id.container, restaurantsFragment).commit();
                     break;
@@ -81,26 +111,47 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         });
     }
 
+    /**
+     * Проверяет возможность переключения элементов меню "Меню" и "Заказ".
+     * Если ни один ресторанр не выбран на текущий момент, то выводит ошибку.
+     * @return true - смена элементов меню на "Меню" или "Заказ" возможна.
+     */
+    private boolean checkSelectedRestaurant() {
+        if (viewModel.getSelectedRestaurant().getValue() == null) {
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+            builder.setTitle(R.string.error)
+                    .setMessage(R.string.primarilySelectRestaurant)
+                    .setPositiveButton(R.string.ok, (dialogInterface, i) -> {
+
+                    }).show();
+
+            return false;
+        }
+
+        return true;
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
         switch (item.getItemId()) {
             case R.id.navigation_restaurants:
                 if (isServicesOK()) {
                     viewModel.setSelectedNavigation(Navigation.Restaurant);
                 }
-                return true;
+                break;
 
             case R.id.navigation_menu:
                 viewModel.setSelectedNavigation(Navigation.Menu);
-                return true;
+                break;
 
             case R.id.navigation_orders:
                 viewModel.setSelectedNavigation(Navigation.Order);
-                return true;
+                break;
 
             case R.id.navigation_still:
                 viewModel.setSelectedNavigation(Navigation.Options);
-                return true;
+                break;
         }
 
         return false;
