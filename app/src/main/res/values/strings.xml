@@ -17,7 +17,6 @@
     <string name="create_account_error">Не удалось создать аккаунт</string>
     <string name="login_failed">"Авторизация провалена"</string>
     <string name="create_success">"Создание аккаунта успешно. Выполните авторизацию."</string>
-    <string name="title_activity_main">MainActivity</string>
     <string name="title_menu">Меню</string>
     <string name="title_orders">Заказы</string>
     <string name="title_restaurants">Рестораны</string>
@@ -31,4 +30,13 @@
     <string name="none">None</string>
     <string name="testDate">00.00.0000</string>
     <string name="testTime">00:00</string>
+    <string name="startGuestCount">1</string>
+    <string name="startItemMenuCount">0</string>
+    <string name="price">Цена:</string>
+    <string name="name_of_dish">Name of dish</string>
+    <string name="description_of_the_dish">Description of the dish</string>
+    <string name="quantity">Количество:</string>
+    <string name="priceValue">1000</string>
+    <string name="currency">руб.</string>
+    <string name="add_to_cart">Добавить в корзину</string>
 </resources>
