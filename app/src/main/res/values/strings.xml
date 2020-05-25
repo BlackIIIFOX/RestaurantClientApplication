@@ -39,4 +39,7 @@
     <string name="priceValue">1000</string>
     <string name="currency">руб.</string>
     <string name="add_to_cart">Добавить в корзину</string>
+    <string name="error">Ошибка</string>
+    <string name="primarilySelectRestaurant">Сначала выберите ресторан.</string>
+    <string name="ok">Ок</string>
 </resources>
