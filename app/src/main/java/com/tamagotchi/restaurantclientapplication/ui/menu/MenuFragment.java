@@ -1,7 +1,10 @@
 package com.tamagotchi.restaurantclientapplication.ui.menu;
 
+import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +17,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.tamagotchi.restaurantclientapplication.Application;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.restaurantclientapplication.data.model.FullMenuItem;
@@ -43,20 +48,25 @@ public class MenuFragment extends Fragment {
     private FilesRepository filesRepository;
     private List<FullMenuItem> fullMenuItems;
 
-    private HashMap<Integer, Bitmap> images = new HashMap<>();
+    private Drawable emptyDishImage;
 
-    private CompositeDisposable listImagesDownloadSubscribers  = new CompositeDisposable();
-    MenuItemsAdapter menuItemsAdapter = new MenuItemsAdapter();
+    private CompositeDisposable listImagesDownloadSubscribers;
+    private MenuItemsAdapter menuItemsAdapter;
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
         viewMenuFragment = inflater.inflate(R.layout.fragment_menu, container, false);
         listView = viewMenuFragment.findViewById(R.id.listViewMenu);
 
+        emptyDishImage = ContextCompat.getDrawable(viewMenuFragment.getContext(), R.drawable.ic_photo);
+        menuItemsAdapter = new MenuItemsAdapter();
+        listImagesDownloadSubscribers = new CompositeDisposable();
+
         if (viewModel.getSelectedRestaurant().getValue() != null) {
             initListView();
         } else {
-            Toast.makeText(requireContext(), "The restaurant was not selected for visiting.", Toast.LENGTH_SHORT).show();
+            throw new RuntimeException("Restaurant must be selected.");
         }
 
         return viewMenuFragment;
@@ -74,25 +84,8 @@ public class MenuFragment extends Fragment {
 
         viewModel.getSelectedRestaurantMenu().observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Success) {
+
                 fullMenuItems = (List<FullMenuItem>) ((Result.Success) result).getData();
-
-                for (FullMenuItem item: fullMenuItems) {
-                    Disposable subscriber = filesRepository.getImageById(item.getDish().getPhotos().get(0))
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeOn(Schedulers.io())
-                            .subscribe(image -> {
-                                images.put(item.getId(), ImageRedactor.getRoundedCornerBitmap(image, 50));
-                                menuItemsAdapter.refresh();
-                                //photo.setImageBitmap(ImageRedactor.getRoundedCornerBitmap(image, 50));
-                            }, error -> {
-                                images.put(item.getId(), ImageRedactor.getRoundedCornerBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_photo), 50));
-                                menuItemsAdapter.refresh();
-                                // photo.setImageBitmap(ImageRedactor.getRoundedCornerBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_photo), 50));
-                            });
-
-                    listImagesDownloadSubscribers.add(subscriber);
-                }
-
                 listView.setAdapter(menuItemsAdapter);
             } else {
                 // TODO: обработка ошибки
@@ -132,7 +125,19 @@ public class MenuFragment extends Fragment {
             TextView count = menuItem.findViewById(R.id.countItemMenu);
             TextView description = menuItem.findViewById(R.id.dishDescription);
 
-            photo.setImageBitmap(images.get(fullMenuItem.getId()));
+            photo.setImageDrawable(emptyDishImage);
+
+            Disposable subscriber = filesRepository.getImageById(fullMenuItem.getDish().getPhotos().get(0))
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(image -> {
+                        photo.setImageBitmap(ImageRedactor.getRoundedCornerBitmap(image, 50));
+                    }, error -> {
+                        throw new RuntimeException(error);
+                    });
+
+            listImagesDownloadSubscribers.add(subscriber);
+
             name.setText(fullMenuItems.get(position).getDish().getName());
             price.setText(Integer.toString(fullMenuItem.getPrice()));
 

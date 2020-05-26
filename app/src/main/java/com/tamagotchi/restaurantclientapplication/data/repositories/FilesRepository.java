@@ -11,6 +11,7 @@ import com.tamagotchi.tamagotchiserverprotocol.routers.IFilesApiService;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -22,6 +23,7 @@ public class FilesRepository {
     // private IDishesApiService dishesApiService;
     private static final Object syncInstance = new Object();
     private IFilesApiService filesApiService;
+    private HashMap<Integer, Bitmap> filesCache = new HashMap<>();
 
     // private constructor : singleton access
     private FilesRepository(IFilesApiService filesApiService) {
@@ -41,8 +43,13 @@ public class FilesRepository {
     }
 
     public Single<Bitmap> getImageById(int id) {
+        if (filesCache.containsKey(id)) {
+            return Single.just(filesCache.get(id));
+        }
+
         // TODO: добавить кеширование.
         return this.filesApiService.downloadFileWithDynamicUrlSync("https://restaurant-tamagotchi.ru:3000/api/files/" + id)
-        .map(responseBody -> BitmapFactory.decodeStream(responseBody.byteStream()));
+                .map(responseBody -> BitmapFactory.decodeStream(responseBody.byteStream()))
+                .doOnSuccess(result -> filesCache.put(id, result));
     }
 }
