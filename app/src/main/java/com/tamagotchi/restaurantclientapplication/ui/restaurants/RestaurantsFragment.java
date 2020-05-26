@@ -11,12 +11,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -59,11 +61,15 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private Integer lastSelectedMarker = null;
 
+    private Location userLocation;
+    private List<RestaurantModel> restaurants;
+
     private Boolean mLocationPermissionsGranted = false;
     private Boolean mGPSPermissionsGranted = false;
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    private View restaurantsFragment;
 
     private MainViewModel viewModel;
 
@@ -73,11 +79,11 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
 
-        View root = inflater.inflate(R.layout.fragment_restaurants, container, false);
+        restaurantsFragment = inflater.inflate(R.layout.fragment_restaurants, container, false);
 
         getLocationPermission();
 
-        return root;
+        return restaurantsFragment;
     }
 
     public boolean isGeoEnabled() {
@@ -96,8 +102,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
                 Task location = mFusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Location currentLocation = (Location) task.getResult();
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM));
+                        userLocation = (Location) task.getResult();
                     } else {
                         Log.d(TAG, "onComplete: current location is null");
                         Toast.makeText(RestaurantsFragment.this.requireContext(), "unable to get current location", Toast.LENGTH_SHORT).show();
@@ -119,22 +124,11 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        updateMap();
 
-        if (mLocationPermissionsGranted) { //TODO: Тестовая версия, раскоментить в релизе
-//            if (!isGeoEnabled()) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.9386300, 30.3141300), 10f));
-//                return;
-//            }
-//
-//            getDeviceLocation();
-//
-//            if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-//                    && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                return;
-//            }
-//            mMap.setMyLocationEnabled(true);
-        }
+        //Наведение камеры на СПБ
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.9386300, 30.3141300), 10f));
+
+        updateMap();
     }
 
     private void updateMap() {
@@ -142,6 +136,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         {
             if (result instanceof Result.Success) {
                 List<RestaurantModel> restaurants = (List<RestaurantModel>) ((Result.Success) result).getData();
+                this.restaurants = restaurants;
                 LatLng restaurantPos;
 
                 HashMap<Integer, Marker> markers = new HashMap();
@@ -158,10 +153,20 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
                     markers.put(restaurant.getId(), restaurantMarker);
                 }
 
+                //Устанавливаем маркер пользователя на карте
+                setCurrentLocation();
+
+                //Активируем кнопку на поиск ближайшего ресторана
+                initNearestMarker();
+
                 // Подписываемся на обновление выбранного маркера.
                 viewModel.getSelectedRestaurant().observe(this, selectedRestaurant -> {
-                    if (selectedRestaurant == null)
+                    if (selectedRestaurant == null) {
+                        if (userLocation != null) {
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()), DEFAULT_ZOOM));
+                        }
                         return;
+                    }
 
                     // Сбрасываем цвет прошлого маркера
                     if (lastSelectedMarker != null) {
@@ -173,18 +178,37 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
 
                     // Устанавливаем зеленый цвет на текущий маркер.
                     Marker selected = markers.get(selectedRestaurant.getId());
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selected.getPosition(), DEFAULT_ZOOM));
 
                     if (selected != null) {
                         selected.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                         lastSelectedMarker = selectedRestaurant.getId();
                     }
                 });
+
+
             } else {
                 // TODO: обработка ошибки
             }
         });
 
         mMap.setOnMarkerClickListener(this);
+    }
+
+    private void setCurrentLocation() {
+        if (mLocationPermissionsGranted) {
+            if (!isGeoEnabled()) {
+                return;
+            }
+
+            getDeviceLocation();
+
+            if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
+        }
     }
 
     private void getLocationPermission() {
@@ -200,6 +224,30 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         } else {
             ActivityCompat.requestPermissions(this.requireActivity(), permission, LOCATION_PERMISSION_REQUEST_CODE);
         }
+    }
+
+    //TODO: Криво, косо, но работает. Потом поправить!
+    private void initNearestMarker() {
+        AppCompatImageButton nearestRestaurant = restaurantsFragment.findViewById(R.id.nearestRestaurant);
+        nearestRestaurant.setOnClickListener((view) -> {
+            if (userLocation != null) {
+                Double restaurantPosX = this.restaurants.get(0).getPositionLatitude(), restaurantPosY = this.restaurants.get(0).getPositionLongitude();
+                Double userPosX = this.userLocation.getLatitude(), userPosY = this.userLocation.getLongitude();
+
+                Double distance = Math.sqrt(Math.pow(restaurantPosX - userPosX, 2) + Math.pow(restaurantPosY - userPosY, 2));
+
+                for (int i = 1; i < this.restaurants.size(); i += 1) {
+                    Double tmpDistance = Math.sqrt(Math.pow(this.restaurants.get(i).getPositionLatitude() - userPosX, 2) + Math.pow(this.restaurants.get(i).getPositionLongitude() - userPosY, 2));
+                    if (distance > tmpDistance) {
+                        distance = tmpDistance;
+                        restaurantPosX = this.restaurants.get(i).getPositionLatitude();
+                        restaurantPosY = this.restaurants.get(i).getPositionLongitude();
+                    }
+                }
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(restaurantPosX, restaurantPosY), DEFAULT_ZOOM));
+            }
+        });
     }
 
     @Override
