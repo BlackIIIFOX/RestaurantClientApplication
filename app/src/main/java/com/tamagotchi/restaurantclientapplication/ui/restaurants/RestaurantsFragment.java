@@ -11,12 +11,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -64,6 +66,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    private View restaurantsFragment;
 
     private MainViewModel viewModel;
 
@@ -73,11 +76,11 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
 
-        View root = inflater.inflate(R.layout.fragment_restaurants, container, false);
+        restaurantsFragment = inflater.inflate(R.layout.fragment_restaurants, container, false);
 
         getLocationPermission();
 
-        return root;
+        return restaurantsFragment;
     }
 
     public boolean isGeoEnabled() {
@@ -119,22 +122,11 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        updateMap();
 
-        if (mLocationPermissionsGranted) { //TODO: Тестовая версия, раскоментить в релизе
-//            if (!isGeoEnabled()) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.9386300, 30.3141300), 10f));
-//                return;
-//            }
-//
-//            getDeviceLocation();
-//
-//            if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-//                    && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                return;
-//            }
-//            mMap.setMyLocationEnabled(true);
-        }
+        //Наведение камеры на СПБ
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.9386300, 30.3141300), 10f));
+
+        updateMap();
     }
 
     private void updateMap() {
@@ -160,8 +152,10 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
 
                 // Подписываемся на обновление выбранного маркера.
                 viewModel.getSelectedRestaurant().observe(this, selectedRestaurant -> {
-                    if (selectedRestaurant == null)
+                    if (selectedRestaurant == null) {
+                        setCurrentLocation();
                         return;
+                    }
 
                     // Сбрасываем цвет прошлого маркера
                     if (lastSelectedMarker != null) {
@@ -173,18 +167,37 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
 
                     // Устанавливаем зеленый цвет на текущий маркер.
                     Marker selected = markers.get(selectedRestaurant.getId());
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selected.getPosition(), DEFAULT_ZOOM));
 
                     if (selected != null) {
                         selected.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                         lastSelectedMarker = selectedRestaurant.getId();
                     }
                 });
+
+
             } else {
                 // TODO: обработка ошибки
             }
         });
 
         mMap.setOnMarkerClickListener(this);
+    }
+
+    private void setCurrentLocation() {
+        if (mLocationPermissionsGranted) {
+            if (!isGeoEnabled()) {
+                return;
+            }
+
+            getDeviceLocation();
+
+            if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
+        }
     }
 
     private void getLocationPermission() {
@@ -200,6 +213,15 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         } else {
             ActivityCompat.requestPermissions(this.requireActivity(), permission, LOCATION_PERMISSION_REQUEST_CODE);
         }
+    }
+
+    private void initNearestMarker() {
+        AppCompatImageButton nearestRestaurant = restaurantsFragment.findViewById(R.id.nearestRestaurant);
+        nearestRestaurant.setOnClickListener((view) -> {
+
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.9386300, 30.3141300), DEFAULT_ZOOM));
+        });
     }
 
     @Override
