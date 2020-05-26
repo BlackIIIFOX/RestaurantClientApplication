@@ -61,6 +61,9 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private Integer lastSelectedMarker = null;
 
+    private Location userLocation;
+    private List<RestaurantModel> restaurants;
+
     private Boolean mLocationPermissionsGranted = false;
     private Boolean mGPSPermissionsGranted = false;
 
@@ -99,8 +102,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
                 Task location = mFusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Location currentLocation = (Location) task.getResult();
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM));
+                        userLocation = (Location) task.getResult();
                     } else {
                         Log.d(TAG, "onComplete: current location is null");
                         Toast.makeText(RestaurantsFragment.this.requireContext(), "unable to get current location", Toast.LENGTH_SHORT).show();
@@ -134,6 +136,7 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         {
             if (result instanceof Result.Success) {
                 List<RestaurantModel> restaurants = (List<RestaurantModel>) ((Result.Success) result).getData();
+                this.restaurants = restaurants;
                 LatLng restaurantPos;
 
                 HashMap<Integer, Marker> markers = new HashMap();
@@ -150,10 +153,18 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
                     markers.put(restaurant.getId(), restaurantMarker);
                 }
 
+                //Устанавливаем маркер пользователя на карте
+                setCurrentLocation();
+
+                //Активируем кнопку на поиск ближайшего ресторана
+                initNearestMarker();
+
                 // Подписываемся на обновление выбранного маркера.
                 viewModel.getSelectedRestaurant().observe(this, selectedRestaurant -> {
                     if (selectedRestaurant == null) {
-                        setCurrentLocation();
+                        if (userLocation != null) {
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()), DEFAULT_ZOOM));
+                        }
                         return;
                     }
 
@@ -215,12 +226,27 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
+    //TODO: Криво, косо, но работает. Потом поправить!
     private void initNearestMarker() {
         AppCompatImageButton nearestRestaurant = restaurantsFragment.findViewById(R.id.nearestRestaurant);
         nearestRestaurant.setOnClickListener((view) -> {
+            if (userLocation != null) {
+                Double restaurantPosX = this.restaurants.get(0).getPositionLatitude(), restaurantPosY = this.restaurants.get(0).getPositionLongitude();
+                Double userPosX = this.userLocation.getLatitude(), userPosY = this.userLocation.getLongitude();
 
+                Double distance = Math.sqrt(Math.pow(restaurantPosX - userPosX, 2) + Math.pow(restaurantPosY - userPosY, 2));
 
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.9386300, 30.3141300), DEFAULT_ZOOM));
+                for (int i = 1; i < this.restaurants.size(); i += 1) {
+                    Double tmpDistance = Math.sqrt(Math.pow(this.restaurants.get(i).getPositionLatitude() - userPosX, 2) + Math.pow(this.restaurants.get(i).getPositionLongitude() - userPosY, 2));
+                    if (distance > tmpDistance) {
+                        distance = tmpDistance;
+                        restaurantPosX = this.restaurants.get(i).getPositionLatitude();
+                        restaurantPosY = this.restaurants.get(i).getPositionLongitude();
+                    }
+                }
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(restaurantPosX, restaurantPosY), DEFAULT_ZOOM));
+            }
         });
     }
 

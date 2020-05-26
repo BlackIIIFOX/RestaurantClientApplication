@@ -5,8 +5,8 @@
     <color name="colorAccent">#D81B60</color>
     <color name="colorSelectItem">#FF441A</color>
     <color name="colorUnSelectItem">#aaa</color>
-    <color name="colorMenu">@color/colorWhite</color>
     <color name="colorMarker">#717973</color>
+    <color name="colorMenu">#4A5151</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorDivider">#ECECEC</color>
     <color name="colorMarkerBackground">#C5FFFFFF</color>
