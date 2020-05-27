@@ -26,7 +26,7 @@
     <string name="still">Еще</string>
     <string name="makeOrder">Сделать заказ</string>
     <string name="numberOfGuests">Количество гостей:</string>
-    <string name="make_payment">Опатить</string>
+    <string name="make_payment">Оплатить</string>
     <string name="none">None</string>
     <string name="testDate">00.00.0000</string>
     <string name="testTime">00:00</string>
@@ -42,4 +42,9 @@
     <string name="error">Ошибка</string>
     <string name="primarilySelectRestaurant">Сначала выберите ресторан.</string>
     <string name="ok">Ок</string>
+    <string name="total">Итого:</string>
+    <string name="orderDetail">Детали заказа</string>
+    <string name="address">Адрес:</string>
+    <string name="date">Дата:</string>
+    <string name="time">Время:</string>
 </resources>

@@ -1,22 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.orders.OrdersFragment"
-    >
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/orderDetailTextView"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_weight="5"
+        android:gravity="fill_vertical"
+        android:paddingStart="20dp"
+        android:text="@string/orderDetail"
+        android:textSize="17sp"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints,RtlSymmetry" />
 
     <LinearLayout
+        android:id="@+id/orderDetailAddressLinearLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="40dp"
+        app:layout_constraintTop_toBottomOf="@+id/orderDetailTextView"
+        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/buttonPayment"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/make_payment" />
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:gravity="fill_vertical"
+            android:paddingStart="20dp"
+            android:text="@string/address"
+            android:textSize="15sp"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/orderDetailAddress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="fill_vertical"
+            android:text="@string/none"
+            android:textSize="15sp"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/orderDetailDateLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:layout_constraintTop_toBottomOf="@+id/orderDetailAddressLinearLayout"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:gravity="fill_vertical"
+            android:paddingStart="20dp"
+            android:text="@string/date"
+            android:textSize="15sp"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/orderDetailDate"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="fill_vertical"
+            android:text="@string/testDate"
+            android:textSize="15sp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/orderDetailTimeLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:layout_constraintTop_toBottomOf="@+id/orderDetailDateLinearLayout"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:gravity="fill_vertical"
+            android:paddingStart="20dp"
+            android:text="@string/time"
+            android:textSize="15sp"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/orderDetailTime"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="fill_vertical"
+            android:text="@string/testTime"
+            android:textSize="15sp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/totalPaymentDue"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/buttonPayment">
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/total"
+            android:textSize="17sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/startItemMenuCount"
+            android:textColor="@color/colorBlack"
+            android:textSize="19sp" />
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/currency"
+            android:textColor="@color/colorBlack"
+            android:textSize="19sp" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonPayment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_make_order_background"
+        android:text="@string/make_payment"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        tools:ignore="MissingConstraints" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

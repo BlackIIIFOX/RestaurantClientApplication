@@ -6,21 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashSet;
 
@@ -32,7 +27,6 @@ import ru.yandex.money.android.sdk.PaymentMethodType;
 import ru.yandex.money.android.sdk.PaymentParameters;
 import ru.yandex.money.android.sdk.SavePaymentMethod;
 import ru.yandex.money.android.sdk.TestParameters;
-import ru.yandex.money.android.sdk.TokenizationResult;
 
 public class OrdersFragment extends Fragment {
 
