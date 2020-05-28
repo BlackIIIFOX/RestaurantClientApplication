@@ -17,14 +17,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.ui.menu.MenuFragment;
 import com.tamagotchi.restaurantclientapplication.ui.orders.OrdersFragment;
 import com.tamagotchi.restaurantclientapplication.ui.restaurants.RestaurantsFragment;
 import com.tamagotchi.restaurantclientapplication.ui.still.StillFragment;
+import com.tamagotchi.tamagotchiserverprotocol.models.ErrorResponse;
+
+import java.io.IOException;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import okhttp3.ResponseBody;
+import retrofit2.HttpException;
 import ru.yandex.money.android.sdk.Checkout;
 import ru.yandex.money.android.sdk.TokenizationResult;
 
@@ -190,7 +197,29 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(() -> Toast.makeText(ordersFragment.getContext(), R.string.orderSuccessCreated, Toast.LENGTH_LONG).show(),
-                                    error -> Toast.makeText(ordersFragment.getContext(), R.string.orderErrorCreated, Toast.LENGTH_LONG).show());
+                                    error -> {
+                                        String textError = error.toString();
+                                        if (error instanceof HttpException) {
+                                            ResponseBody body = ((HttpException) error).response().errorBody();
+
+                                            Gson gson = new Gson();
+                                            TypeAdapter<ErrorResponse> adapter = gson.getAdapter
+                                                    (ErrorResponse.class);
+
+                                            try {
+                                                ErrorResponse errorParser =
+                                                        adapter.fromJson(body.string());
+
+                                                textError = errorParser.getMessage();
+
+                                            } catch (IOException ignored) {
+                                            }
+                                        }
+
+                                        Toast.makeText(ordersFragment.getContext(),
+                                                getResources().getString(R.string.orderErrorCreated) + "(" + textError + ")", Toast.LENGTH_LONG)
+                                                .show();
+                                    });
 
                     viewModel.setSelectedNavigation(Navigation.Options);
                     break;

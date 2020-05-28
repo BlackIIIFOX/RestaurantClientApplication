@@ -283,10 +283,16 @@ public class MainViewModel extends ViewModel {
             orderMenu.add(menuItem.getId());
         }
 
+        if (orderMenu.size() == 0) {
+            orderMenu = null;
+        }
+
+        Calendar timeVisitCalendar = orderVisitInfo.getValue().getVisitTime();
+        TimeZone timeZone = timeVisitCalendar.getTimeZone();
         SimpleDateFormat sdf;
         sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-        sdf.setTimeZone(TimeZone.getTimeZone("CET"));
-        String timeVisit = sdf.format( orderVisitInfo.getValue().getVisitTime());
+        sdf.setTimeZone(timeVisitCalendar.getTimeZone());
+        String timeVisit = sdf.format(timeVisitCalendar.getTime());
 
         return new OrderCreateModel(getSelectedRestaurant().getValue().getId(),
                 currentUser.getId(),

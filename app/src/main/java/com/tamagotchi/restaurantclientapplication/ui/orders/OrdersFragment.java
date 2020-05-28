@@ -14,13 +14,18 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.common.logging.Logger;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.model.FullMenuItem;
 import com.tamagotchi.restaurantclientapplication.data.repositories.OrderRepository;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
+import com.tamagotchi.tamagotchiserverprotocol.models.ErrorResponse;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderCreateModel;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Currency;
@@ -32,6 +37,8 @@ import java.util.Objects;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import okhttp3.ResponseBody;
+import retrofit2.HttpException;
 import ru.yandex.money.android.sdk.Amount;
 import ru.yandex.money.android.sdk.Checkout;
 import ru.yandex.money.android.sdk.GooglePayCardNetwork;
@@ -70,8 +77,30 @@ public class OrdersFragment extends Fragment {
                 viewModel.doOrder()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> Toast.makeText(ordersFragment.getContext(), R.string.orderSuccessCreated, Toast.LENGTH_LONG).show(),
-                        error -> Toast.makeText(ordersFragment.getContext(), R.string.orderErrorCreated, Toast.LENGTH_LONG).show());
+                        .subscribe(() -> Toast.makeText(ordersFragment.getContext(), R.string.orderSuccessCreated, Toast.LENGTH_LONG).show(),
+                                error -> {
+                                    String textError = error.toString();
+                                    if (error instanceof HttpException) {
+                                        ResponseBody body = ((HttpException) error).response().errorBody();
+
+                                        Gson gson = new Gson();
+                                        TypeAdapter<ErrorResponse> adapter = gson.getAdapter
+                                                (ErrorResponse.class);
+
+                                        try {
+                                            ErrorResponse errorParser =
+                                                    adapter.fromJson(body.string());
+
+                                            textError = errorParser.getMessage();
+
+                                        } catch (IOException ignored) {
+                                        }
+                                    }
+
+                                    Toast.makeText(ordersFragment.getContext(),
+                                            getResources().getString(R.string.orderErrorCreated) + "(" + textError + ")", Toast.LENGTH_LONG)
+                                            .show();
+                                });
             } else {
                 timeToStartPayment();
                 // Создание заказа будет обработано в MainActivity
@@ -93,7 +122,7 @@ public class OrdersFragment extends Fragment {
         PaymentParameters paymentParameters = new PaymentParameters(
                 new Amount(new BigDecimal(getPayment()), Currency.getInstance("RUB")),
                 "Заказ в Tamagotchi",
-                "",
+                "Меню в тамагочи",
                 "live_AAAAAAAAAAAAAAAAAAAA",
                 "12345",
                 SavePaymentMethod.ON,
@@ -149,7 +178,7 @@ public class OrdersFragment extends Fragment {
         List<FullMenuItem> menu = viewModel.getUserMenu().getValue();
         if (menu != null && menu.size() > 0) {
             int forPayment = 0;
-            for (FullMenuItem menuItem: menu) {
+            for (FullMenuItem menuItem : menu) {
                 forPayment += menuItem.getPrice();
             }
 
@@ -159,18 +188,18 @@ public class OrdersFragment extends Fragment {
         return 0;
     }
 
-    private Map<String,Integer> getMapMenu() {
+    private Map<String, Integer> getMapMenu() {
         List<FullMenuItem> menu = viewModel.getUserMenu().getValue();
 
         if (menu != null && menu.size() > 0) {
             Map<String, Integer> selectedMenu = new HashMap<String, Integer>();
 
-            for (FullMenuItem menuItem: menu) {
+            for (FullMenuItem menuItem : menu) {
                 String itemMenuName = menuItem.getDish().getName();
                 if (selectedMenu.containsKey(itemMenuName)) {
                     selectedMenu.put(itemMenuName, selectedMenu.get(itemMenuName) + 1);
                 } else {
-                    selectedMenu.put(itemMenuName,1);
+                    selectedMenu.put(itemMenuName, 1);
                 }
             }
 
