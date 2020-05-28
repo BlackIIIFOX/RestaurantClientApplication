@@ -10,4 +10,5 @@
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorDivider">#ECECEC</color>
     <color name="colorMarkerBackground">#C5FFFFFF</color>
+    <color name="colorBlack">#000</color>
 </resources>

@@ -14,7 +14,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -120,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         if (viewModel.getSelectedRestaurant().getValue() == null) {
             MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
             builder.setTitle(R.string.error)
-                    .setMessage(R.string.primarilySelectRestaurant)
+                    .setMessage(R.string.primarily_select_restaurant)
                     .setPositiveButton(R.string.ok, (dialogInterface, i) -> {
 
                     }).show();
