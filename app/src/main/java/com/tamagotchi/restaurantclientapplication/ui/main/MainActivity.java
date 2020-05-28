@@ -193,10 +193,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     // но для этого надо подключить яндекс кассы (быть ИП или индивидуальным предпринимателем).
                     TokenizationResult result = Checkout.createTokenizationResult(data);
 
-                    viewModel.doOrder(result.getPaymentToken())
+                    String token = result.getPaymentToken();
+
+                    viewModel.doOrder(token)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(() -> Toast.makeText(ordersFragment.getContext(), R.string.orderSuccessCreated, Toast.LENGTH_LONG).show(),
+                            .subscribe(() -> Toast.makeText(this, R.string.orderSuccessCreated, Toast.LENGTH_LONG).show(),
                                     error -> {
                                         String textError = error.toString();
                                         if (error instanceof HttpException) {
@@ -216,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                                             }
                                         }
 
-                                        Toast.makeText(ordersFragment.getContext(),
+                                        Toast.makeText(this,
                                                 getResources().getString(R.string.orderErrorCreated) + "(" + textError + ")", Toast.LENGTH_LONG)
                                                 .show();
                                     });
