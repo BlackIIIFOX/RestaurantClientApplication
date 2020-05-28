@@ -119,8 +119,10 @@ public class OrdersFragment extends Fragment {
         googlePayCardNetworks.add(GooglePayCardNetwork.MASTERCARD);
         googlePayCardNetworks.add(GooglePayCardNetwork.VISA);
 
+        int paymentValue = getPayment();
+
         PaymentParameters paymentParameters = new PaymentParameters(
-                new Amount(new BigDecimal(getPayment()), Currency.getInstance("RUB")),
+                new Amount(new BigDecimal(paymentValue), Currency.getInstance("RUB")),
                 "Заказ в Tamagotchi",
                 "Меню в тамагочи",
                 "live_AAAAAAAAAAAAAAAAAAAA",
