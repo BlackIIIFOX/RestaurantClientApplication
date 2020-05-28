@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.tamagotchi.restaurantclientapplication.data.repositories.DishesRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.MenuRepository;
+import com.tamagotchi.restaurantclientapplication.data.repositories.OrderRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.RestaurantsRepository;
 import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
 import com.tamagotchi.restaurantclientapplication.ui.start.StartViewModel;
@@ -21,7 +22,9 @@ public class MainViewModelFactory implements ViewModelProvider.Factory {
                 viewModel = new MainViewModel(
                         RestaurantsRepository.getInstance(),
                         DishesRepository.getInstance(),
-                        MenuRepository.getInstance()
+                        MenuRepository.getInstance(),
+                        AuthenticationService.getInstance(),
+                        OrderRepository.getInstance()
                         );
             }
 

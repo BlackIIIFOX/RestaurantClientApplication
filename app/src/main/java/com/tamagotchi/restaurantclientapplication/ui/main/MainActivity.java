@@ -23,6 +23,8 @@ import com.tamagotchi.restaurantclientapplication.ui.orders.OrdersFragment;
 import com.tamagotchi.restaurantclientapplication.ui.restaurants.RestaurantsFragment;
 import com.tamagotchi.restaurantclientapplication.ui.still.StillFragment;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import ru.yandex.money.android.sdk.Checkout;
 import ru.yandex.money.android.sdk.TokenizationResult;
 
@@ -183,7 +185,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     // Токен сформирован, дальше нужно отправить его на сервер и ждать результат,
                     // но для этого надо подключить яндекс кассы (быть ИП или индивидуальным предпринимателем).
                     TokenizationResult result = Checkout.createTokenizationResult(data);
-                    result.getPaymentToken();
+
+                    viewModel.doOrder(result.getPaymentToken())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(() -> Toast.makeText(ordersFragment.getContext(), R.string.orderSuccessCreated, Toast.LENGTH_LONG).show(),
+                                    error -> Toast.makeText(ordersFragment.getContext(), R.string.orderErrorCreated, Toast.LENGTH_LONG).show());
+
                     viewModel.setSelectedNavigation(Navigation.Options);
                     break;
                 case RESULT_CANCELED:

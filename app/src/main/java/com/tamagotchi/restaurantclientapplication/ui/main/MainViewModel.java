@@ -11,16 +11,21 @@ import com.tamagotchi.restaurantclientapplication.data.model.FullMenuItem;
 import com.tamagotchi.restaurantclientapplication.data.model.OrderVisitInfo;
 import com.tamagotchi.restaurantclientapplication.data.repositories.DishesRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.MenuRepository;
+import com.tamagotchi.restaurantclientapplication.data.repositories.OrderRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.RestaurantsRepository;
-import com.tamagotchi.tamagotchiserverprotocol.models.DishModel;
-import com.tamagotchi.tamagotchiserverprotocol.models.MenuItem;
+import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
+import com.tamagotchi.tamagotchiserverprotocol.models.OrderCreateModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
+import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -38,6 +43,12 @@ public class MainViewModel extends ViewModel {
      * Репозиторий меню.
      */
     private MenuRepository menuRepository;
+
+    /**
+     * Сервис для работы с аутинтификацией пользователя.
+     */
+    private AuthenticationService authenticationService;
+    private OrderRepository orderRepository;
 
     /**
      * Репозиторий для блюд.
@@ -74,16 +85,33 @@ public class MainViewModel extends ViewModel {
      */
     private MutableLiveData<List<FullMenuItem>> userMenuSubject = new MutableLiveData<>();
 
+    /**
+     * Текущий пользователь.
+     */
+    private UserModel currentUser;
+
     private Disposable menuItemRequest = null;
 
     private List<FullMenuItem> userMenu = new ArrayList<>();
 
-    MainViewModel(RestaurantsRepository restaurantsRepository, DishesRepository dishesRepository, MenuRepository menuRepository) {
+    MainViewModel(RestaurantsRepository restaurantsRepository, DishesRepository dishesRepository,
+                  MenuRepository menuRepository, AuthenticationService authenticationService,
+                  OrderRepository orderRepository) {
         this.restaurantsRepository = restaurantsRepository;
         this.dishesRepository = dishesRepository;
         this.menuRepository = menuRepository;
+        this.authenticationService = authenticationService;
+        this.orderRepository = orderRepository;
         InitRestaurants();
         InitOrderVisitInfo();
+        InitUser();
+    }
+
+    private void InitUser() {
+        this.authenticationService.currentUser().subscribe(
+                currentUser -> this.currentUser = currentUser,
+                RuntimeException::new
+        );
     }
 
     private void InitOrderVisitInfo() {
@@ -150,7 +178,7 @@ public class MainViewModel extends ViewModel {
         return selectedRestaurantMenu;
     }
 
-    public void setSelectedRestaurantMenu(Result<List<FullMenuItem>> restaurantMenu) {
+    private void setSelectedRestaurantMenu(Result<List<FullMenuItem>> restaurantMenu) {
         selectedRestaurantMenu.setValue(restaurantMenu);
     }
 
@@ -238,5 +266,34 @@ public class MainViewModel extends ViewModel {
      */
     public LiveData<Navigation> getSelectedNavigation() {
         return selectedNavigation;
+    }
+
+    public Completable doOrder() {
+        return orderRepository.createOrder(buildOrderInfo(null));
+    }
+
+    public Completable doOrder(String paymentToken) {
+        return orderRepository.createOrder(buildOrderInfo(paymentToken));
+    }
+
+    private OrderCreateModel buildOrderInfo(String paymentToken) {
+        List<Integer> orderMenu = new ArrayList<>();
+        for (FullMenuItem menuItem:
+             userMenu) {
+            orderMenu.add(menuItem.getId());
+        }
+
+        SimpleDateFormat sdf;
+        sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        sdf.setTimeZone(TimeZone.getTimeZone("CET"));
+        String timeVisit = sdf.format( orderVisitInfo.getValue().getVisitTime());
+
+        return new OrderCreateModel(getSelectedRestaurant().getValue().getId(),
+                currentUser.getId(),
+                orderMenu,
+                orderVisitInfo.getValue().getNumberOfVisitors(),
+                null,
+                paymentToken,
+                timeVisit);
     }
 }

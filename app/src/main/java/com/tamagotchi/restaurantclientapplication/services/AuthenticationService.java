@@ -5,6 +5,7 @@ import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthPasswordEx
 import com.tamagotchi.restaurantclientapplication.data.model.LoginInfo;
 import com.tamagotchi.tamagotchiserverprotocol.models.AuthenticateInfoModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.CredentialsModel;
+import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAccountApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IAuthenticateApiService;
 import com.tamagotchi.tamagotchiserverprotocol.services.IAuthenticateInfoService;
@@ -18,28 +19,43 @@ import retrofit2.HttpException;
 
 public class AuthenticationService {
 
-    private static final Object syncInstance = new Object();
-    private static AuthenticationService instance;
-
     private IAccountApiService accountApiService;
     private IAuthenticateApiService authenticateApiService;
     private IAuthenticateInfoService authenticateInfoService;
-    private AuthenticationInfoStorageService storageService = new AuthenticationInfoStorageService();
+    private AuthenticationInfoStorageService storageService;
 
     private Observable<Boolean> isAuthenticatedSource;
     private BehaviorSubject<Boolean> isAuthenticatedSourceSubject;
+
+    private BehaviorSubject<UserModel> currentUserSubject;
+    private Observable<UserModel> currentUserSource;
 
     public Observable<Boolean> isAuthenticated() {
         return isAuthenticatedSource;
     }
 
-    private AuthenticationService(IAuthenticateApiService authenticateApiService, IAuthenticateInfoService authenticateInfoService, IAccountApiService accountApiService) {
+    public Observable<UserModel> currentUser() {
+        return currentUserSource;
+    }
+
+    private static final Object syncInstance = new Object();
+    private static AuthenticationService instance;
+
+    private AuthenticationService(IAuthenticateApiService authenticateApiService,
+                          IAuthenticateInfoService authenticateInfoService,
+                          IAccountApiService accountApiService,
+                          AuthenticationInfoStorageService authenticationStorageService) {
         this.authenticateApiService = authenticateApiService;
         this.authenticateInfoService = authenticateInfoService;
         this.accountApiService = accountApiService;
+        this.storageService = authenticationStorageService;
 
         isAuthenticatedSourceSubject = BehaviorSubject.create();
+        currentUserSubject = BehaviorSubject.create();
+
         isAuthenticatedSource = isAuthenticatedSourceSubject.hide();
+        currentUserSource = currentUserSubject.hide();
+
         this.loadAuthenticate();
     }
 
@@ -49,16 +65,15 @@ public class AuthenticationService {
         }
     }
 
-    synchronized static void InitializeService(IAuthenticateApiService authenticateApiService, IAuthenticateInfoService authenticateInfoService, IAccountApiService accountApiService) {
+    synchronized static void InitializeService(IAuthenticateApiService authenticateApiService, IAuthenticateInfoService authenticateInfoService, IAccountApiService accountApiService, AuthenticationInfoStorageService authenticationInfoStorageService) {
         synchronized (syncInstance) {
-            instance = new AuthenticationService(authenticateApiService, authenticateInfoService, accountApiService);
+            instance = new AuthenticationService(authenticateApiService, authenticateInfoService, accountApiService, authenticationInfoStorageService);
         }
     }
 
     public void signOut() {
         storageService.removeToken();
         isAuthenticatedSourceSubject.onNext(false);
-
     }
 
     public Completable signIn(LoginInfo loginInfo) {
@@ -83,7 +98,7 @@ public class AuthenticationService {
                                 // Сохраяем jwt и авторизируемся
                                 authenticateInfoService.LogIn(new AuthenticateInfoModel(accountAuthData.getToken()));
                                 storageService.saveToken(accountAuthData.getToken());
-                                isAuthenticatedSourceSubject.onNext(true);
+                                loadAuthenticate();
 
                                 source.onComplete();
                             },
@@ -118,18 +133,21 @@ public class AuthenticationService {
         }
 
         if (authenticateInfoService.isAuthenticate()) {
-            this.accountApiService.getCurrentAccount().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
-                    account -> {
-                        isAuthenticatedSourceSubject.onNext(true);
-                    }
-                    , error -> {
-                        isAuthenticatedSourceSubject.onError(new AuthLoginException());
-                        authenticateInfoService.LogOut();
-                        signOut();
-                    }
-            );
+            this.accountApiService.getCurrentAccount()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            account -> {
+                                isAuthenticatedSourceSubject.onNext(true);
+                                currentUserSubject.onNext(account);
+                            }
+                            , error -> {
+                                authenticateInfoService.LogOut();
+                                signOut();
+                            }
+                    );
         } else {
-            isAuthenticatedSourceSubject.onError(new AuthLoginException());
+            isAuthenticatedSourceSubject.onNext(false);
         }
     }
 }

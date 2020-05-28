@@ -48,4 +48,6 @@
     <string name="date">Дата:</string>
     <string name="time">Время:</string>
     <string name="selected_menu">Выбранное меню:</string>
+    <string name="orderSuccessCreated">Заказ создан. Мы вас ожидаем.</string>
+    <string name="orderErrorCreated">Создание заказа не удалось.</string>
 </resources>

@@ -1,9 +1,12 @@
 package com.tamagotchi.restaurantclientapplication.data.repositories;
 
+import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderCreateModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderPathModel;
+import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.enums.OrderStatus;
+import com.tamagotchi.tamagotchiserverprotocol.routers.IAuthenticateApiService;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IOrdersApiService;
 
 import java.util.List;
@@ -17,11 +20,21 @@ public class OrderRepository {
     private static volatile OrderRepository instance;
 
     private IOrdersApiService ordersApiService;
+    private AuthenticationService authenticateApiService;
     private static final Object syncInstance = new Object();
+    private UserModel currentUser;
 
     // private constructor : singleton access
-    private OrderRepository(IOrdersApiService ordersApiService) {
+    private OrderRepository(IOrdersApiService ordersApiService, AuthenticationService authenticateApiService) {
         this.ordersApiService = ordersApiService;
+        this.authenticateApiService = authenticateApiService;
+        initCurrentUser();
+    }
+
+    private void initCurrentUser() {
+        authenticateApiService.currentUser().subscribe(userModel -> {
+            currentUser = userModel;
+        });
     }
 
     public static OrderRepository getInstance() {
@@ -30,14 +43,14 @@ public class OrderRepository {
         }
     }
 
-    public static void InitializeService(IOrdersApiService ordersApiService) {
+    public static void InitializeService(IOrdersApiService ordersApiService, AuthenticationService authenticationService) {
         synchronized (syncInstance) {
-            instance = new OrderRepository(ordersApiService);
+            instance = new OrderRepository(ordersApiService, authenticationService);
         }
     }
 
-    public Single<List<OrderModel>> getAllOrders(String clientFilter, OrderStatus statusFilter, OrderStatus cooksStatusFilter, OrderStatus waitersStatusFilter) {
-        return null;
+    public Single<List<OrderModel>> getAllOrders() {
+        return ordersApiService.getAllOrders(currentUser.getId(), null, null, null);
     }
 
     public Single<OrderModel> getOrderById(Integer orderId) {
@@ -45,14 +58,7 @@ public class OrderRepository {
     }
 
     public Completable createOrder(OrderCreateModel newOder) {
-        return Completable.create(source -> {
-            ordersApiService.createOrder(newOder)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(source::onComplete, error -> {
-                        source.onError(new Exception(error));
-                    });
-        });
+        return ordersApiService.createOrder(newOder);
     }
 
     public Single<OrderModel> pathOrder(Integer orderId, OrderPathModel order) {

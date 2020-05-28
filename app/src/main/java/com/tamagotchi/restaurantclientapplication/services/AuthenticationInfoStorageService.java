@@ -11,13 +11,6 @@ public class AuthenticationInfoStorageService {
     private static final String TAG = "AuthenticationInfoStorageService";
     private final static String TOKEN = "token";
 
-    public void loadToken() {
-        String token = getToken();
-        if (!token.isEmpty()) {
-            RestaurantClient.getInstance().getAuthenticateInfoService().LogIn(new AuthenticateInfoModel(token));
-        }
-    }
-
     String getToken() {
         String token = Application.getPrefs().getString(TOKEN, "");
         Log.i(TAG, "Token get: " + token);

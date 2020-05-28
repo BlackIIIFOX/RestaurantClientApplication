@@ -127,7 +127,6 @@ public class MenuFragment extends Fragment {
                     .subscribe(image -> {
                         photo.setImageBitmap(ImageRedactor.getRoundedCornerBitmap(image, 50));
                     }, error -> {
-                        throw new RuntimeException(error);
                     });
 
             listImagesDownloadSubscribers.add(subscriber);

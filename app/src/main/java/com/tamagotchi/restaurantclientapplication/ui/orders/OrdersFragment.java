@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import ru.yandex.money.android.sdk.Amount;
 import ru.yandex.money.android.sdk.Checkout;
 import ru.yandex.money.android.sdk.GooglePayCardNetwork;
@@ -59,24 +62,19 @@ public class OrdersFragment extends Fragment {
         return ordersFragment;
     }
 
-    //TODO: Все не красиво, через ..., потом исправить!!!
-    private void formOnOrder() {
-        OrderRepository orderRepository = OrderRepository.getInstance();
-
-        OrderCreateModel orderCreateModel = new OrderCreateModel(Integer restaurant, Integer client, @NotNull List<Integer> menu, Integer numberOfPersons, String comment, String paymentToken, String visitTime);
-
-
-        orderRepository.createOrder(orderCreateModel);
-    }
-
     private void initOrderButton() {
         Button makeOrderButton = ordersFragment.findViewById(R.id.buttonPayment);
 
         makeOrderButton.setOnClickListener(view -> {
             if (viewModel.getUserMenu().getValue() == null || viewModel.getUserMenu().getValue().isEmpty()) {
-                formOnOrder();
+                viewModel.doOrder()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> Toast.makeText(ordersFragment.getContext(), R.string.orderSuccessCreated, Toast.LENGTH_LONG).show(),
+                        error -> Toast.makeText(ordersFragment.getContext(), R.string.orderErrorCreated, Toast.LENGTH_LONG).show());
             } else {
                 timeToStartPayment();
+                // Создание заказа будет обработано в MainActivity
             }
         });
     }
@@ -106,11 +104,11 @@ public class OrdersFragment extends Fragment {
         );
         paymentParameters.paymentMethodTypes.remove(PaymentMethodType.YANDEX_MONEY);
 
-        TestParameters testParameters = new TestParameters(true, true, new MockConfiguration(false, true, 5));
+        TestParameters testParameters = new TestParameters(true,
+                true, new MockConfiguration(false, true, 5));
 
-        Intent intent = Checkout.createTokenizeIntent(getContext(), paymentParameters, testParameters);
-
-        formOnOrder();
+        Intent intent = Checkout.createTokenizeIntent(getContext(),
+                paymentParameters, testParameters);
 
         getActivity().startActivityForResult(intent, REQUEST_CODE_TOKENIZE);
     }
