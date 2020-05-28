@@ -86,7 +86,7 @@
             android:paddingTop="14dp"
             android:paddingBottom="14dp"
             android:layout_gravity="center"
-            android:text="@string/testDate"
+            android:text="@string/test_date"
             android:textSize="15sp"/>
 
         <ImageButton
@@ -123,7 +123,7 @@
             android:paddingTop="14dp"
             android:paddingBottom="14dp"
             android:layout_gravity="center"
-            android:text="@string/testTime"
+            android:text="@string/test_time"
             android:textSize="15sp"/>
 
         <ImageButton
@@ -150,7 +150,7 @@
             android:paddingTop="15dp"
             android:paddingBottom="15dp"
             android:paddingStart="55dp"
-            android:text="@string/numberOfGuests"
+            android:text="@string/number_of_guests"
             android:textSize="15sp" />
 
         <LinearLayout
@@ -175,7 +175,7 @@
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="@string/startGuestCount"
+                android:text="@string/start_guest_count"
                 android:textSize="15sp" />
 
             <ImageButton
@@ -203,7 +203,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:background="@drawable/button_make_order_background"
-            android:text="@string/makeOrder"
+            android:text="@string/make_order"
             android:textColor="@color/colorWhite"
             android:textSize="15sp" />
 

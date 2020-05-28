@@ -15,7 +15,7 @@
         android:layout_weight="5"
         android:gravity="fill_vertical"
         android:paddingStart="20dp"
-        android:text="@string/orderDetail"
+        android:text="@string/order_detail"
         android:textColor="@color/colorBlack"
         android:textSize="17sp"
         app:layout_constraintTop_toTopOf="parent"
@@ -71,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="fill_vertical"
-            android:text="@string/testDate"
+            android:text="@string/test_date"
             android:textSize="15sp"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -99,7 +99,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="fill_vertical"
-            android:text="@string/testTime"
+            android:text="@string/test_time"
             android:textSize="15sp"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -118,7 +118,7 @@
             android:layout_width="150dp"
             android:layout_height="match_parent"
             android:gravity="fill_vertical"
-            android:text="@string/numberOfGuests"
+            android:text="@string/number_of_guests"
             android:textSize="15sp"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -127,7 +127,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="fill_vertical"
-            android:text="@string/startItemMenuCount"
+            android:text="@string/start_item_menu_count"
             android:textSize="15sp"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -146,7 +146,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:gravity="fill_vertical"
-            android:text="@string/selectedMenu"
+            android:text="@string/selected_menu"
             android:textSize="15sp" />
 
         <TextView
@@ -176,7 +176,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="@string/startItemMenuCount"
+            android:text="@string/start_item_menu_count"
             android:textColor="@color/colorBlack"
             android:textSize="19sp" />
 
@@ -194,7 +194,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_make_order_background"
-        android:text="@string/make_payment"
+        android:text="@string/make_an_order"
         android:textColor="@color/colorWhite"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="10dp"

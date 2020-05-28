@@ -15,15 +15,19 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.model.FullMenuItem;
+import com.tamagotchi.restaurantclientapplication.data.repositories.OrderRepository;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
+import com.tamagotchi.tamagotchiserverprotocol.models.OrderCreateModel;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import ru.yandex.money.android.sdk.Amount;
 import ru.yandex.money.android.sdk.Checkout;
@@ -45,28 +49,40 @@ public class OrdersFragment extends Fragment {
     private static SimpleDateFormat dataFormat = new SimpleDateFormat("dd.MM.yyyy");
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("kk:mm");
 
-    private Map<String, Integer> selectedMenu = new HashMap<String, Integer>();
-    private int forPayment = 0;
-
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
         ordersFragment = inflater.inflate(R.layout.fragment_orders, container, false);
 
-        initPaymentButton();
+        initOrderButton();
         initInfoAboutVisit();
 
         return ordersFragment;
     }
 
-    private void initPaymentButton() {
-        Button makePayment = ordersFragment.findViewById(R.id.buttonPayment);
-        makePayment.setOnClickListener(view -> {
-            timeToStartCheckout();
+    //TODO: Все не красиво, через ..., потом исправить!!!
+    private void formOnOrder() {
+        OrderRepository orderRepository = OrderRepository.getInstance();
+
+        OrderCreateModel orderCreateModel = new OrderCreateModel(Integer restaurant, Integer client, @NotNull List<Integer> menu, Integer numberOfPersons, String comment, String paymentToken, String visitTime);
+
+
+        orderRepository.createOrder(orderCreateModel);
+    }
+
+    private void initOrderButton() {
+        Button makeOrderButton = ordersFragment.findViewById(R.id.buttonPayment);
+
+        makeOrderButton.setOnClickListener(view -> {
+            if (viewModel.getUserMenu().getValue() == null || viewModel.getUserMenu().getValue().isEmpty()) {
+                formOnOrder();
+            } else {
+                timeToStartPayment();
+            }
         });
     }
 
     // Иницилизируем оплату для получения токена оплаты.
-    private void timeToStartCheckout() {
+    private void timeToStartPayment() {
         HashSet<PaymentMethodType> paymentMethodTypes = new HashSet<>();
         paymentMethodTypes.add(PaymentMethodType.SBERBANK);
         paymentMethodTypes.add(PaymentMethodType.GOOGLE_PAY);
@@ -76,17 +92,10 @@ public class OrdersFragment extends Fragment {
         googlePayCardNetworks.add(GooglePayCardNetwork.MASTERCARD);
         googlePayCardNetworks.add(GooglePayCardNetwork.VISA);
 
-        String orderMenu = "";
-        int counter = 1;
-        for(Map.Entry<String, Integer> item : this.selectedMenu.entrySet()){
-            orderMenu = counter + ". " + item.getKey() + "     x" + item.getValue() + " ";
-            counter += 1;
-        }
-
         PaymentParameters paymentParameters = new PaymentParameters(
-                new Amount(new BigDecimal(forPayment), Currency.getInstance("RUB")),
+                new Amount(new BigDecimal(getPayment()), Currency.getInstance("RUB")),
                 "Заказ в Tamagotchi",
-                orderMenu,
+                "",
                 "live_AAAAAAAAAAAAAAAAAAAA",
                 "12345",
                 SavePaymentMethod.ON,
@@ -100,6 +109,9 @@ public class OrdersFragment extends Fragment {
         TestParameters testParameters = new TestParameters(true, true, new MockConfiguration(false, true, 5));
 
         Intent intent = Checkout.createTokenizeIntent(getContext(), paymentParameters, testParameters);
+
+        formOnOrder();
+
         getActivity().startActivityForResult(intent, REQUEST_CODE_TOKENIZE);
     }
 
@@ -122,28 +134,52 @@ public class OrdersFragment extends Fragment {
         });
     }
 
-    //TODO: Какая-то хрень с жизненным циклом активити...
+    //TODO: Какая-то хрень с жизненным циклом активити...возможно но не точно, подумать!
     //TODO: Нужно сделать нормальный адаптер для ListView и использовать его как в MenuFragment так и в OrderFragment иначе у нас будут проблемы с разметкой (они уже есть...)
     private void initSelectedMenu() {
-        viewModel.getUserMenu().observe(getViewLifecycleOwner(), menu -> {
-            if (menu.size() > 0) {
-                for (FullMenuItem menuItem: menu) {
-                    String itemMenuName = menuItem.getDish().getName();
-                    if (this.selectedMenu.containsKey(itemMenuName)) {
-                        selectedMenu.put(itemMenuName, this.selectedMenu.get(itemMenuName) + 1);
-                    } else {
-                        this.selectedMenu.put(itemMenuName,1);
-                    }
-                    forPayment += menuItem.getPrice();
-                }
-
-                for(Map.Entry<String, Integer> item : this.selectedMenu.entrySet()){
-                    addTextInTextView(ordersFragment.findViewById(R.id.listMenu),"- " + item.getKey() + "     x" + item.getValue() + "\n");
-                }
-
-                setTextInTextView(ordersFragment.findViewById(R.id.totalPaymentDue), Integer.toString(forPayment));
+        Map<String, Integer> selectedMenu = getMapMenu();
+        if (selectedMenu != null) {
+            for (Map.Entry<String, Integer> item : getMapMenu().entrySet()) {
+                addTextInTextView(ordersFragment.findViewById(R.id.listMenu), "- " + item.getKey() + "     x" + item.getValue() + "\n");
             }
-        });
+        }
+
+        setTextInTextView(ordersFragment.findViewById(R.id.totalPaymentDue), Integer.toString(getPayment()));
+    }
+
+    private int getPayment() {
+        List<FullMenuItem> menu = viewModel.getUserMenu().getValue();
+        if (menu != null && menu.size() > 0) {
+            int forPayment = 0;
+            for (FullMenuItem menuItem: menu) {
+                forPayment += menuItem.getPrice();
+            }
+
+            return forPayment;
+        }
+
+        return 0;
+    }
+
+    private Map<String,Integer> getMapMenu() {
+        List<FullMenuItem> menu = viewModel.getUserMenu().getValue();
+
+        if (menu != null && menu.size() > 0) {
+            Map<String, Integer> selectedMenu = new HashMap<String, Integer>();
+
+            for (FullMenuItem menuItem: menu) {
+                String itemMenuName = menuItem.getDish().getName();
+                if (selectedMenu.containsKey(itemMenuName)) {
+                    selectedMenu.put(itemMenuName, selectedMenu.get(itemMenuName) + 1);
+                } else {
+                    selectedMenu.put(itemMenuName,1);
+                }
+            }
+
+            return selectedMenu;
+        }
+
+        return null;
     }
 
     private void setTextInTextView(TextView textView, String text) {

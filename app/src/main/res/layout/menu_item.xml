@@ -50,7 +50,7 @@
                     android:id="@+id/dishPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/priceValue"
+                    android:text="@string/price_value"
                     android:layout_margin="5dp"/>
 
                 <TextView
@@ -95,7 +95,7 @@
                         android:layout_width="50dp"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:text="@string/startItemMenuCount"
+                        android:text="@string/start_item_menu_count"
                         android:textSize="15sp" />
 
                     <ImageButton
