@@ -14,6 +14,7 @@ a mobile application with a convenient interface.
 - [Web client](https://github.com/paulrozhkin/tamagotchi-web-client)
 - [Server](https://github.com/paulrozhkin/tamagotchi-server)
 - [Android stuff application](https://github.com/ForsaiR/RestaurantEmployerApplication)
+- [Tamagotchi Remote Library](https://github.com/paulrozhkin/tamagotchi-remote-library)
 
 ---
 ## Documentation
