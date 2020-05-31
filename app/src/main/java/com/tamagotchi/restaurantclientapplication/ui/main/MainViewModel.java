@@ -288,10 +288,13 @@ public class MainViewModel extends ViewModel {
         }
 
         Calendar timeVisitCalendar = orderVisitInfo.getValue().getVisitTime();
-        TimeZone timeZone = timeVisitCalendar.getTimeZone();
         SimpleDateFormat sdf;
         sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         sdf.setTimeZone(timeVisitCalendar.getTimeZone());
+        // Убираем секунды и миллисекунды из заказа
+        // TODO: сделать это на сервере (на текущий момент это заняло бы больше времени, чем поставить тут)
+        timeVisitCalendar.set(Calendar.SECOND, 0);
+        timeVisitCalendar.set(Calendar.MILLISECOND, 0);
         String timeVisit = sdf.format(timeVisitCalendar.getTime());
 
         return new OrderCreateModel(getSelectedRestaurant().getValue().getId(),
