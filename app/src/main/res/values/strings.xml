@@ -56,4 +56,8 @@
     <string name="placeholderTime">00.00.0000 00:00</string>
     <string name="placeholderOrderState">В ожидании</string>
     <string name="orderStateText">Состояние:</string>
+    <string name="logOut">Выйти</string>
+    <string name="logOutConfirm">Вы действительно хотите выйти?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 </resources>

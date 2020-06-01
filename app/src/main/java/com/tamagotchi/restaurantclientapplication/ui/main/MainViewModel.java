@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.tamagotchi.restaurantclientapplication.Application;
 import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.restaurantclientapplication.data.model.FullMenuItem;
 import com.tamagotchi.restaurantclientapplication.data.model.OrderVisitInfo;
@@ -97,6 +98,7 @@ public class MainViewModel extends ViewModel {
     MainViewModel(RestaurantsRepository restaurantsRepository, DishesRepository dishesRepository,
                   MenuRepository menuRepository, AuthenticationService authenticationService,
                   OrderRepository orderRepository) {
+        Application.startWorking();
         this.restaurantsRepository = restaurantsRepository;
         this.dishesRepository = dishesRepository;
         this.menuRepository = menuRepository;
@@ -118,6 +120,10 @@ public class MainViewModel extends ViewModel {
         Calendar visitTime = Calendar.getInstance();
         visitTime.add(Calendar.HOUR, 1);
         orderVisitInfo.setValue(new OrderVisitInfo(visitTime, 1));
+    }
+
+    public void logOut() {
+        authenticationService.signOut();
     }
 
     public LiveData<Result<List<RestaurantModel>>> getRestaurants() {

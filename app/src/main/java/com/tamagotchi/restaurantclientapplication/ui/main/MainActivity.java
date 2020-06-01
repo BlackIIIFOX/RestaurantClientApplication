@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(() -> {
                                 Toast.makeText(this, R.string.orderSuccessCreated, Toast.LENGTH_LONG).show();
-                                viewModel.getUserMenu().observe(this.ordersFragment.getViewLifecycleOwner(), List::clear);
+                                viewModel.clearUserMenu();
                                 },
                                     error -> {
                                         String textError = error.toString();
