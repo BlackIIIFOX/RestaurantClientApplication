@@ -50,4 +50,10 @@
     <string name="selected_menu">Выбранное меню:</string>
     <string name="orderSuccessCreated">Заказ создан. Мы вас ожидаем.</string>
     <string name="orderErrorCreated">Создание заказа не удалось.</string>
+    <string name="name">Name</string>
+    <string name="leave_a_review">Оставить отзыв</string>
+    <string name="order_number">Заказ №</string>
+    <string name="placeholderTime">00.00.0000 00:00</string>
+    <string name="placeholderOrderState">В ожидании</string>
+    <string name="orderStateText">Состояние:</string>
 </resources>
