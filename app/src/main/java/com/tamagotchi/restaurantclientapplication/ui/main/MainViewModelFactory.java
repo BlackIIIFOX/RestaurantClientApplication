@@ -9,6 +9,7 @@ import com.tamagotchi.restaurantclientapplication.data.repositories.FeedbackRepo
 import com.tamagotchi.restaurantclientapplication.data.repositories.MenuRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.OrderRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.RestaurantsRepository;
+import com.tamagotchi.restaurantclientapplication.data.repositories.UsersRepository;
 import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
 import com.tamagotchi.restaurantclientapplication.ui.start.StartViewModel;
 
@@ -26,7 +27,8 @@ public class MainViewModelFactory implements ViewModelProvider.Factory {
                         MenuRepository.getInstance(),
                         AuthenticationService.getInstance(),
                         OrderRepository.getInstance(),
-                        FeedbackRepository.getInstance()
+                        FeedbackRepository.getInstance(),
+                        UsersRepository.getInstance()
                         );
             }
 
