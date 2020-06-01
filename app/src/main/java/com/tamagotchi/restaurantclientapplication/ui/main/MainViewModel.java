@@ -11,10 +11,12 @@ import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.restaurantclientapplication.data.model.FullMenuItem;
 import com.tamagotchi.restaurantclientapplication.data.model.OrderVisitInfo;
 import com.tamagotchi.restaurantclientapplication.data.repositories.DishesRepository;
+import com.tamagotchi.restaurantclientapplication.data.repositories.FeedbackRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.MenuRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.OrderRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.RestaurantsRepository;
 import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
+import com.tamagotchi.tamagotchiserverprotocol.models.FeedbackCreateModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderCreateModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
@@ -49,7 +51,16 @@ public class MainViewModel extends ViewModel {
      * Сервис для работы с аутинтификацией пользователя.
      */
     private AuthenticationService authenticationService;
+
+    /**
+     * Репозиторий для отзывов.
+     */
     private OrderRepository orderRepository;
+
+    /**
+     * Репозиторий для заказов.
+     */
+    private FeedbackRepository feedbackRepository;
 
     /**
      * Репозиторий для блюд.
@@ -97,8 +108,9 @@ public class MainViewModel extends ViewModel {
 
     MainViewModel(RestaurantsRepository restaurantsRepository, DishesRepository dishesRepository,
                   MenuRepository menuRepository, AuthenticationService authenticationService,
-                  OrderRepository orderRepository) {
+                  OrderRepository orderRepository, FeedbackRepository feedbackRepository) {
         Application.startWorking();
+        this.feedbackRepository = feedbackRepository;
         this.restaurantsRepository = restaurantsRepository;
         this.dishesRepository = dishesRepository;
         this.menuRepository = menuRepository;
@@ -107,6 +119,11 @@ public class MainViewModel extends ViewModel {
         InitRestaurants();
         InitOrderVisitInfo();
         InitUser();
+    }
+
+    public void sendFeedback(String feedback) {
+        FeedbackCreateModel feedbackCreateModel = new FeedbackCreateModel(feedback);
+        feedbackRepository.addFeedback(feedbackCreateModel);
     }
 
     private void InitUser() {

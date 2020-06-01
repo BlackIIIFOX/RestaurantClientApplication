@@ -39,10 +39,10 @@ public class Application extends android.app.Application {
                     // Если пользователь был разлогирован,
                     // то нужно закрыть доступ к основной части приложения.
                     if (!isAuth && workInMainViewModel) {
-                        Intent loginActivity = new Intent(this, StartActivity.class);
-                        loginActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        loginActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(loginActivity);
+                        Intent startActivity = new Intent(this, StartActivity.class);
+                        startActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(startActivity);
                     }
                 });
     }

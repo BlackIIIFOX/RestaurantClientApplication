@@ -60,4 +60,5 @@
     <string name="logOutConfirm">Вы действительно хотите выйти?</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="write_feedback">Напишите отзыв</string>
 </resources>

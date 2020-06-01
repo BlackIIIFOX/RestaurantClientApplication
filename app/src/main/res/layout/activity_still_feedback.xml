@@ -21,12 +21,18 @@
     </FrameLayout>
 
     <EditText
+        android:id="@+id/feedbackEditText"
         android:layout_width="match_parent"
-        android:padding="5dp"
+        android:padding="10dp"
         android:layout_height="200dp"
-        android:background="@android:color/transparent"/>
+        android:inputType="textMultiLine"
+        android:gravity="top"
+        android:hint="@string/write_feedback"
+
+        android:background="@android:color/transparent" />
 
     <Button
+        android:id="@+id/sendFeedbackButton"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/button_make_order_background"
