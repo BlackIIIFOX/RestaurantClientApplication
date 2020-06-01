@@ -61,4 +61,12 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="write_feedback">Напишите отзыв</string>
+    <string name="no_place_status">Нет мест</string>
+    <string name="payment_madeing_status">Оплата</string>
+    <string name="payment_error_status">Ошибка оплаты</string>
+    <string name="confirmed_status">Подтвежден</string>
+    <string name="preparing_status">Идет подготовка</string>
+    <string name="prepared_status">Подготовлен</string>
+    <string name="completed_status">Завершен</string>
+    <string name="staff_notified_status">Персонал оповещен</string>
 </resources>

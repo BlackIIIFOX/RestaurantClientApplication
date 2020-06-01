@@ -15,6 +15,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import retrofit2.http.Query;
 
 public class OrderRepository {
     private static volatile OrderRepository instance;

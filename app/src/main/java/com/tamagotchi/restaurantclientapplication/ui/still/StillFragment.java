@@ -3,28 +3,30 @@ package com.tamagotchi.restaurantclientapplication.ui.still;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tamagotchi.restaurantclientapplication.R;
-import com.tamagotchi.restaurantclientapplication.data.model.OrderVisitInfo;
-import com.tamagotchi.restaurantclientapplication.ui.main.MainActivity;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
-import com.tamagotchi.restaurantclientapplication.ui.main.Navigation;
-import com.tamagotchi.restaurantclientapplication.ui.slidingpanel.SlidingPanelRestaurants;
 import com.tamagotchi.restaurantclientapplication.ui.slidingpanel.SlidingPanelStillFeedback;
-import com.tamagotchi.restaurantclientapplication.ui.start.StartActivity;
+import com.tamagotchi.tamagotchiserverprotocol.models.OrderModel;
 
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StillFragment extends Fragment {
 
@@ -32,6 +34,7 @@ public class StillFragment extends Fragment {
 
     private View stillFragment;
     private MainViewModel viewModel;
+    private ListView ordersListView;
 
 
     @Override
@@ -40,10 +43,19 @@ public class StillFragment extends Fragment {
         viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
         stillFragment = inflater.inflate(R.layout.fragment_still, container, false);
 
+        //initUser();
         initButtons();
         initListOrders();
 
         return stillFragment;
+    }
+
+    private void initUser() {
+        TextView textView = stillFragment.findViewById(R.id.userNameView);
+        String userName = viewModel.getUserName();
+        if (userName != null) {
+            textView.setText(userName);
+        }
     }
 
     private void initButtons() {
@@ -82,6 +94,23 @@ public class StillFragment extends Fragment {
     }
 
     private void initListOrders() {
+        ordersListView = stillFragment.findViewById(R.id.userOrdersList);
 
+        ordersListView.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
+            ArrayAdapter<OrderModel> adapter = (ArrayAdapter<OrderModel>) parent.getAdapter();
+            OrderModel order = adapter.getItem(position);
+            viewModel.setSelectedOrder(order);
+        });
+
+        initOrdersSubscribe();
+    }
+
+    private void initOrdersSubscribe() {
+        viewModel.getUserOrders().observe(getViewLifecycleOwner(),this::initListViewAdapter);
+        viewModel.refreshOrders();
+    }
+
+    private void initListViewAdapter(List<OrderModel> orders) {
+        ordersListView.setAdapter(new OrdersAdapterListView(this.getContext(), new ArrayList<>(orders)));
     }
 }

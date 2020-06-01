@@ -18,6 +18,7 @@ import com.tamagotchi.restaurantclientapplication.data.repositories.RestaurantsR
 import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
 import com.tamagotchi.tamagotchiserverprotocol.models.FeedbackCreateModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderCreateModel;
+import com.tamagotchi.tamagotchiserverprotocol.models.OrderModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
 
@@ -30,6 +31,7 @@ import java.util.TimeZone;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -102,6 +104,18 @@ public class MainViewModel extends ViewModel {
      */
     private UserModel currentUser;
 
+    /**
+     * Все заказы пользователя.
+     */
+    private MutableLiveData<List<OrderModel>> allUserOrders = new MutableLiveData<>();
+
+    private MutableLiveData<OrderModel> selectedOrderSubject = new MutableLiveData<>();
+
+    /**
+     * Subscriber для завершенных заказов.
+     */
+    private Disposable completedOrdersSubscriber;
+
     private Disposable menuItemRequest = null;
 
     private List<FullMenuItem> userMenu = new ArrayList<>();
@@ -119,11 +133,7 @@ public class MainViewModel extends ViewModel {
         InitRestaurants();
         InitOrderVisitInfo();
         InitUser();
-    }
-
-    public void sendFeedback(String feedback) {
-        FeedbackCreateModel feedbackCreateModel = new FeedbackCreateModel(feedback);
-        feedbackRepository.addFeedback(feedbackCreateModel);
+        initSubscribeAllOrders();
     }
 
     private void InitUser() {
@@ -139,8 +149,59 @@ public class MainViewModel extends ViewModel {
         orderVisitInfo.setValue(new OrderVisitInfo(visitTime, 1));
     }
 
+    /**
+     * Получить все заказы системы.
+     *
+     * @return Single на коллекци заказов
+     */
+    private Single<List<OrderModel>> getAllUserOrders() {
+        return orderRepository.getAllOrders();
+    }
+
+    private void initSubscribeAllOrders() {
+        completedOrdersSubscriber = getAllUserOrders()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        orders -> this.allUserOrders.setValue(orders),
+                        error -> {
+                        }
+                );
+    }
+
+    public String getUserName() {
+        return currentUser.getFullName();
+    }
+
     public void logOut() {
         authenticationService.signOut();
+    }
+
+    public void sendFeedback(String feedback) {
+        FeedbackCreateModel feedbackCreateModel = new FeedbackCreateModel(feedback);
+        feedbackRepository.addFeedback(feedbackCreateModel);
+    }
+
+    public void refreshOrders() {
+        allUserOrders.setValue(new ArrayList<>());
+
+        if (completedOrdersSubscriber != null) {
+            completedOrdersSubscriber.dispose();
+        }
+
+        this.initSubscribeAllOrders();
+    }
+
+    public LiveData<List<OrderModel>> getUserOrders() {
+        return allUserOrders;
+    }
+
+    public void setSelectedOrder(OrderModel order) {
+        selectedOrderSubject.setValue(order);
+    }
+
+    public LiveData<OrderModel> getSelectedOrder() {
+        return selectedOrderSubject;
     }
 
     public LiveData<Result<List<RestaurantModel>>> getRestaurants() {
