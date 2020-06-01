@@ -23,7 +23,6 @@ public class Application extends android.app.Application {
         mApp = this;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         BootstrapService.getInstance().InitializeApplication();
-        // AuthenticationService.getInstance().signOut();
 
         InitLogoutHandler();
     }
@@ -33,7 +32,7 @@ public class Application extends android.app.Application {
     }
 
     private void InitLogoutHandler() {
-        applicationGraph.authService().isAuthenticated()
+        AuthenticationService.getInstance().isAuthenticated()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(isAuth -> {
