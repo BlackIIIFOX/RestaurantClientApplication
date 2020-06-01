@@ -20,6 +20,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
+import com.tamagotchi.restaurantclientapplication.ui.slidingpanel.SlidingPanelStillAboutMe;
 import com.tamagotchi.restaurantclientapplication.ui.slidingpanel.SlidingPanelStillFeedback;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderModel;
 
@@ -43,7 +44,7 @@ public class StillFragment extends Fragment {
         viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
         stillFragment = inflater.inflate(R.layout.fragment_still, container, false);
 
-        //initUser();
+        initUser();
         initButtons();
         initListOrders();
 
@@ -52,10 +53,11 @@ public class StillFragment extends Fragment {
 
     private void initUser() {
         TextView textView = stillFragment.findViewById(R.id.userNameView);
-        String userName = viewModel.getUserName();
-        if (userName != null) {
-            textView.setText(userName);
-        }
+        viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+            if (user.getFullName() != null) {
+                textView.setText(user.getFullName());
+            }
+        });
     }
 
     private void initButtons() {
@@ -82,7 +84,11 @@ public class StillFragment extends Fragment {
     }
 
     private void initButtonEditAboutMe() {
-
+        AppCompatImageButton button = stillFragment.findViewById(R.id.profileEditButton);
+        button.setOnClickListener((view) -> {
+            SlidingPanelStillAboutMe SlidingPanelStillAboutMe = new SlidingPanelStillAboutMe();
+            SlidingPanelStillAboutMe.show(requireActivity().getSupportFragmentManager(), TAG);
+        });
     }
 
     private void initButtonFeedback() {

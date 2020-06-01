@@ -15,11 +15,13 @@ import com.tamagotchi.restaurantclientapplication.data.repositories.FeedbackRepo
 import com.tamagotchi.restaurantclientapplication.data.repositories.MenuRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.OrderRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.RestaurantsRepository;
+import com.tamagotchi.restaurantclientapplication.data.repositories.UsersRepository;
 import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
 import com.tamagotchi.tamagotchiserverprotocol.models.FeedbackCreateModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderCreateModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
+import com.tamagotchi.tamagotchiserverprotocol.models.UpdatableInfoUser;
 import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
 
 import java.text.SimpleDateFormat;
@@ -58,6 +60,11 @@ public class MainViewModel extends ViewModel {
      * Репозиторий для отзывов.
      */
     private OrderRepository orderRepository;
+
+    /**
+     * Репозиторий для пользователя.
+     */
+    private UsersRepository usersRepository;
 
     /**
      * Репозиторий для заказов.
@@ -100,11 +107,6 @@ public class MainViewModel extends ViewModel {
     private MutableLiveData<List<FullMenuItem>> userMenuSubject = new MutableLiveData<>();
 
     /**
-     * Текущий пользователь.
-     */
-    private UserModel currentUser;
-
-    /**
      * Все заказы пользователя.
      */
     private MutableLiveData<List<OrderModel>> allUserOrders = new MutableLiveData<>();
@@ -112,8 +114,15 @@ public class MainViewModel extends ViewModel {
     private MutableLiveData<OrderModel> selectedOrderSubject = new MutableLiveData<>();
 
     /**
+     * Текущий пользователь.
+     */
+    private MutableLiveData<UserModel> currentUser = new MutableLiveData<>();
+
+    /**
      * Subscriber для завершенных заказов.
      */
+    private Disposable completedUserSubscriber;
+
     private Disposable completedOrdersSubscriber;
 
     private Disposable menuItemRequest = null;
@@ -122,7 +131,7 @@ public class MainViewModel extends ViewModel {
 
     MainViewModel(RestaurantsRepository restaurantsRepository, DishesRepository dishesRepository,
                   MenuRepository menuRepository, AuthenticationService authenticationService,
-                  OrderRepository orderRepository, FeedbackRepository feedbackRepository) {
+                  OrderRepository orderRepository, FeedbackRepository feedbackRepository, UsersRepository usersRepository) {
         Application.startWorking();
         this.feedbackRepository = feedbackRepository;
         this.restaurantsRepository = restaurantsRepository;
@@ -130,6 +139,7 @@ public class MainViewModel extends ViewModel {
         this.menuRepository = menuRepository;
         this.authenticationService = authenticationService;
         this.orderRepository = orderRepository;
+        this.usersRepository = usersRepository;
         InitRestaurants();
         InitOrderVisitInfo();
         InitUser();
@@ -137,10 +147,12 @@ public class MainViewModel extends ViewModel {
     }
 
     private void InitUser() {
-        this.authenticationService.currentUser().subscribe(
-                currentUser -> this.currentUser = currentUser,
-                RuntimeException::new
-        );
+        completedUserSubscriber = this.authenticationService.currentUser().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        currentUser -> this.currentUser.setValue(currentUser),
+                        RuntimeException::new
+                );
     }
 
     private void InitOrderVisitInfo() {
@@ -169,8 +181,33 @@ public class MainViewModel extends ViewModel {
                 );
     }
 
-    public String getUserName() {
-        return currentUser.getFullName();
+    public LiveData<UserModel> getUser() {
+        return currentUser;
+    }
+
+    public void setUserName(String userName) {
+        UserModel currentUser = this.currentUser.getValue();
+        UserModel userModel = new UserModel(currentUser.getId(), currentUser.getLogin(),
+                currentUser.getRole(), userName, currentUser.getIsBlocked(), currentUser.getAvatar());
+        this.currentUser.setValue(userModel);
+    }
+
+    public void refreshCurrentUser() {
+        UserModel user = this.currentUser.getValue();
+        UpdatableInfoUser updatableInfoUser = new UpdatableInfoUser(user.getLogin(), user.getRole(),
+                user.getFullName(), user.getIsBlocked(), user.getAvatar(), )
+        currentUser.setValue(new UserModel());
+
+        if (completedUserSubscriber != null) {
+            completedUserSubscriber.dispose();
+        }
+
+        completedUserSubscriber = this.usersRepository.updateUser(user).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        currentUser -> this.currentUser.setValue(currentUser),
+                        RuntimeException::new
+                );
     }
 
     public void logOut() {
@@ -382,7 +419,7 @@ public class MainViewModel extends ViewModel {
         String timeVisit = sdf.format(timeVisitCalendar.getTime());
 
         return new OrderCreateModel(getSelectedRestaurant().getValue().getId(),
-                currentUser.getId(),
+                currentUser.getValue().getId(),
                 orderMenu,
                 orderVisitInfo.getValue().getNumberOfVisitors(),
                 null,

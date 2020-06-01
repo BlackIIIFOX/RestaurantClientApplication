@@ -69,4 +69,5 @@
     <string name="prepared_status">Подготовлен</string>
     <string name="completed_status">Завершен</string>
     <string name="staff_notified_status">Персонал оповещен</string>
+    <string name="edit">Изменить</string>
 </resources>
