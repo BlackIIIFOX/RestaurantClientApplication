@@ -23,7 +23,6 @@ import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 import com.tamagotchi.restaurantclientapplication.ui.slidingpanel.SlidingPanelStillAboutMe;
 import com.tamagotchi.restaurantclientapplication.ui.slidingpanel.SlidingPanelStillFeedback;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderModel;
-import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
 
 import androidx.annotation.Nullable;
 

@@ -192,8 +192,8 @@ public class MainViewModel extends ViewModel {
     public void setUserName(String userName) {
         UserModel currentUser = this.currentUser.getValue();
 
-        UpdatableInfoUser updatableInfoUser = new UpdatableInfoUser(currentUser.getLogin(), currentUser.getRole(),
-                userName, "false", currentUser.getAvatar(), "");
+        UpdatableInfoUser updatableInfoUser = new UpdatableInfoUser(null, currentUser.getRole(),
+                userName, null, currentUser.getAvatar(), null);
 
         this.currentUser.setValue(new UserModel());
 
@@ -201,7 +201,7 @@ public class MainViewModel extends ViewModel {
             completedUserSubscriber.dispose();
         }
 
-        completedUserSubscriber = this.usersRepository.updateUser(updatableInfoUser).subscribeOn(Schedulers.io())
+        completedUserSubscriber = this.usersRepository.updateUser(currentUser.getId(), updatableInfoUser).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         user -> this.currentUser.setValue(user),
