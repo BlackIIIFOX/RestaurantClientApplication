@@ -147,7 +147,6 @@ public class MainViewModel extends ViewModel {
         InitRestaurants();
         InitOrderVisitInfo();
         InitUser();
-        initSubscribeAllOrders();
     }
 
     private void InitUser() {
@@ -165,24 +164,21 @@ public class MainViewModel extends ViewModel {
         orderVisitInfo.setValue(new OrderVisitInfo(visitTime, 1));
     }
 
-    /**
-     * Получить все заказы системы.
-     *
-     * @return Single на коллекци заказов
-     */
-    private Single<List<OrderModel>> getAllUserOrders() {
-        return orderRepository.getAllOrders();
-    }
 
     private void initSubscribeAllOrders() {
-        completedOrdersSubscriber = getAllUserOrders()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        orders -> this.allUserOrders.setValue(orders),
-                        error -> {
-                        }
-                );
+        UserModel currentUser = this.currentUser.getValue();
+        if (currentUser != null) {
+            completedOrdersSubscriber = this.orderRepository.getUserOrders(currentUser.getId())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            orders -> this.allUserOrders.setValue(orders),
+                            error -> {
+                            }
+                    );
+        } else {
+            Log.e(LogTag, "initSubscribeAllOrders: User not initialize");
+        }
     }
 
     public LiveData<UserModel> getUser() {
@@ -194,8 +190,6 @@ public class MainViewModel extends ViewModel {
 
         UpdatableInfoUser updatableInfoUser = new UpdatableInfoUser(null, currentUser.getRole(),
                 userName, null, currentUser.getAvatar(), null);
-
-        this.currentUser.setValue(new UserModel());
 
         if (completedUserSubscriber != null) {
             completedUserSubscriber.dispose();

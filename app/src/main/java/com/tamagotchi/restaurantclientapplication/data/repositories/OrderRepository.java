@@ -23,19 +23,11 @@ public class OrderRepository {
     private IOrdersApiService ordersApiService;
     private AuthenticationService authenticateApiService;
     private static final Object syncInstance = new Object();
-    private UserModel currentUser;
 
     // private constructor : singleton access
     private OrderRepository(IOrdersApiService ordersApiService, AuthenticationService authenticateApiService) {
         this.ordersApiService = ordersApiService;
         this.authenticateApiService = authenticateApiService;
-        initCurrentUser();
-    }
-
-    private void initCurrentUser() {
-        authenticateApiService.currentUser().subscribe(userModel -> {
-            currentUser = userModel;
-        });
     }
 
     public static OrderRepository getInstance() {
@@ -50,8 +42,13 @@ public class OrderRepository {
         }
     }
 
-    public Single<List<OrderModel>> getAllOrders() {
-        return ordersApiService.getAllOrders(currentUser.getId(), null, null, null);
+    /**
+     * Получить все заказы пользователя.
+     *
+     * @return Single на коллекци заказов
+     */
+    public Single<List<OrderModel>> getUserOrders(int userId) {
+        return ordersApiService.getAllOrders(userId, null, null, null);
     }
 
     public Single<OrderModel> getOrderById(Integer orderId) {

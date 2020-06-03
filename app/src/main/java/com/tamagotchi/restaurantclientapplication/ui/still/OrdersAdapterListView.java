@@ -15,6 +15,7 @@ import com.tamagotchi.restaurantclientapplication.services.RfcToCalendarConverte
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.enums.StaffStatus;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -68,7 +69,7 @@ public class OrdersAdapterListView extends ArrayAdapter<OrderModel> {
         try {
             Calendar startTime = RfcToCalendarConverter.convert(order.getVisitTime().getStart());
             timeString = timeFormat.format(startTime.getTime());
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException | ParseException ex) {
             Log.e(TAG, "Can't convert visit time", ex);
         }
 

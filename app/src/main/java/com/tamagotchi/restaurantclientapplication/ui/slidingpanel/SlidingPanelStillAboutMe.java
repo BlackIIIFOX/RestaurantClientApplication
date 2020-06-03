@@ -42,8 +42,6 @@ public class SlidingPanelStillAboutMe extends BottomSheetDialogFragment {
         if (user != null) {
             if (user.getFullName() != null) {
                 editTextName.setText(user.getFullName());
-            } else if (user.getLogin() != null) {
-                editTextName.setText(user.getLogin());
             }
         }
     }
