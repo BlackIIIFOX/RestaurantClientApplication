@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RestaurantClientApplication</string>
+    <string name="app_name">@string/tamagotchi</string>
     <string name="tamagotchi">Tamagotchi</string>
     <string name="create_account">СОЗДАТЬ АККАУНТ</string>
     <string name="logo">logo</string>
