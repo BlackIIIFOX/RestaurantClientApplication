@@ -1,17 +1,12 @@
 package com.tamagotchi.restaurantclientapplication.ui.main;
 
-import android.graphics.BitmapFactory;
 import android.util.Log;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.tamagotchi.restaurantclientapplication.Application;
-import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.Result;
 import com.tamagotchi.restaurantclientapplication.data.model.FullMenuItem;
 import com.tamagotchi.restaurantclientapplication.data.model.OrderVisitInfo;
@@ -22,7 +17,6 @@ import com.tamagotchi.restaurantclientapplication.data.repositories.OrderReposit
 import com.tamagotchi.restaurantclientapplication.data.repositories.RestaurantsRepository;
 import com.tamagotchi.restaurantclientapplication.data.repositories.UsersRepository;
 import com.tamagotchi.restaurantclientapplication.services.AuthenticationService;
-import com.tamagotchi.restaurantclientapplication.ui.restaurants.RestaurantsFragment;
 import com.tamagotchi.tamagotchiserverprotocol.models.FeedbackCreateModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderCreateModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderModel;
@@ -34,12 +28,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -200,7 +192,7 @@ public class MainViewModel extends ViewModel {
                 .subscribe(
                         user -> this.currentUser.setValue(user),
                         error -> {
-                            this.currentUser.setValue(currentUser);
+                            Log.e(LogTag, "Can't update user info", error);
                         });
     }
 
@@ -210,7 +202,14 @@ public class MainViewModel extends ViewModel {
 
     public void sendFeedback(String feedback) {
         FeedbackCreateModel feedbackCreateModel = new FeedbackCreateModel(feedback);
-        feedbackRepository.addFeedback(feedbackCreateModel);
+        feedbackRepository.addFeedback(feedbackCreateModel)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(success -> {
+                    // Отправлен, нужно оповещение пользователя
+                }, error -> {
+                    Log.e(LogTag, "Can't send feedback", error);
+                });
     }
 
     public void refreshOrders() {
@@ -242,6 +241,7 @@ public class MainViewModel extends ViewModel {
 
     /**
      * Возвращает observable на элементы меню, которые выбрал пользователь.
+     *
      * @return LiveData меню пользователя.
      */
     public LiveData<List<FullMenuItem>> getUserMenu() {
@@ -250,6 +250,7 @@ public class MainViewModel extends ViewModel {
 
     /**
      * Добавить новый элемент меню в пользовательеское меню.
+     *
      * @param menuItem новый элемент меню.
      */
     public void addToUserMenu(FullMenuItem menuItem) {
@@ -260,6 +261,7 @@ public class MainViewModel extends ViewModel {
 
     /**
      * Удалить элемент из пользовательского меню.
+     *
      * @param menuItem удаляемый элемент.
      */
     public void removeFromUserMenu(FullMenuItem menuItem) {
@@ -279,6 +281,7 @@ public class MainViewModel extends ViewModel {
 
     /**
      * Возвращает observable на меню ресторана.
+     *
      * @return LiveData на меню ресторана.
      */
     public LiveData<Result<List<FullMenuItem>>> getSelectedRestaurantMenu() {
@@ -316,8 +319,9 @@ public class MainViewModel extends ViewModel {
      * 1. Получаем коллекцию MenuItem с сервера.
      * 2. По каждому MenuItem запрашивем Dish, который ему принадлежит.
      * 3. Формируем FullMenuItem из Dish и MenuItem, делаем коллекцию из элементов и
-     *  отправляем в LiveData.
-     *  TODO: возможно стоит убрать возврат коллекций из репозиториев, но это довольно сложно.
+     * отправляем в LiveData.
+     * TODO: возможно стоит убрать возврат коллекций из репозиториев, но это довольно сложно.
+     *
      * @param restaurant ресторан, меню которого требуется инициализировать.
      */
     private void InitRestaurantMenu(RestaurantModel restaurant) {
@@ -385,8 +389,8 @@ public class MainViewModel extends ViewModel {
 
     private OrderCreateModel buildOrderInfo(String paymentToken) {
         List<Integer> orderMenu = new ArrayList<>();
-        for (FullMenuItem menuItem:
-             userMenu) {
+        for (FullMenuItem menuItem :
+                userMenu) {
             orderMenu.add(menuItem.getId());
         }
 

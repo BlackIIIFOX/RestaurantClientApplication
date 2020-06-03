@@ -124,6 +124,7 @@ public class LoginActivity extends BaseActivity {
 
             if (isNewAccount) {
                 Intent activity2Intent = new Intent(getApplicationContext(), StartActivity.class);
+                loginViewModel.clearLoginResult();
                 startActivity(activity2Intent);
                 showMessage(R.string.create_success);
                 finish();
