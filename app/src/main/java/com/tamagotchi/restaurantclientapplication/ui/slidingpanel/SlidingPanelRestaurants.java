@@ -43,9 +43,9 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class SlidingPanelFragment extends BottomSheetDialogFragment {
+public class SlidingPanelRestaurants extends BottomSheetDialogFragment {
 
-    private static final String TAG = "SlidingPanelFragment";
+    private static final String TAG = "SlidingPanelRestaurants";
 
     private static SimpleDateFormat dataFormat = new SimpleDateFormat("dd.MM.yyyy");
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("kk:mm");

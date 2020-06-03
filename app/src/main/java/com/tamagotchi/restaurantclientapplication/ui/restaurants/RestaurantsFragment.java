@@ -6,22 +6,16 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -36,20 +30,15 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.data.Result;
-import com.tamagotchi.restaurantclientapplication.ui.main.MainActivity;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
-import com.tamagotchi.restaurantclientapplication.ui.menu.MenuFragment;
-import com.tamagotchi.restaurantclientapplication.ui.slidingpanel.SlidingPanelFragment;
+import com.tamagotchi.restaurantclientapplication.ui.slidingpanel.SlidingPanelRestaurants;
 import com.tamagotchi.tamagotchiserverprotocol.models.RestaurantModel;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class RestaurantsFragment extends Fragment implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMarkerClickListener {
 
@@ -274,8 +263,8 @@ public class RestaurantsFragment extends Fragment implements OnMapReadyCallback,
         RestaurantModel currentRestaurant = (RestaurantModel) marker.getTag();
         viewModel.setSelectedRestaurant(currentRestaurant);
 
-        SlidingPanelFragment slidingPanelFragment = new SlidingPanelFragment();
-        slidingPanelFragment.show(requireActivity().getSupportFragmentManager(), "");
+        SlidingPanelRestaurants slidingPanelRestaurants = new SlidingPanelRestaurants();
+        slidingPanelRestaurants.show(requireActivity().getSupportFragmentManager(), TAG);
 
         return true;
     }

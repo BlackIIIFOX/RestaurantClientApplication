@@ -14,6 +14,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -27,6 +28,7 @@ import com.tamagotchi.restaurantclientapplication.ui.still.StillFragment;
 import com.tamagotchi.tamagotchiserverprotocol.models.ErrorResponse;
 
 import java.io.IOException;
+import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -198,7 +200,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     viewModel.doOrder(token)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(() -> Toast.makeText(this, R.string.orderSuccessCreated, Toast.LENGTH_LONG).show(),
+                            .subscribe(() -> {
+                                Toast.makeText(this, R.string.orderSuccessCreated, Toast.LENGTH_LONG).show();
+                                viewModel.clearUserMenu();
+                                },
                                     error -> {
                                         String textError = error.toString();
                                         if (error instanceof HttpException) {
@@ -223,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                                                 .show();
                                     });
 
-                    viewModel.setSelectedNavigation(Navigation.Options);
+                    viewModel.setSelectedNavigation(Navigation.Restaurant);
                     break;
                 case RESULT_CANCELED:
                     // user canceled tokenization

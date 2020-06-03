@@ -1,12 +1,18 @@
 package com.tamagotchi.restaurantclientapplication.data.repositories;
 
 import com.tamagotchi.restaurantclientapplication.data.exceptions.AccountExistException;
+import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthPasswordException;
 import com.tamagotchi.restaurantclientapplication.data.model.LoginInfo;
+import com.tamagotchi.tamagotchiserverprotocol.models.UpdatableInfoUser;
+import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IUsersApiService;
 import com.tamagotchi.tamagotchiserverprotocol.models.CredentialsModel;
 
+import java.util.List;
+
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.HttpException;
 
@@ -62,5 +68,53 @@ public class UsersRepository {
                         }
                     });
         });
+    }
+
+    public Single<UserModel> getUserById(int id) {
+        return Single.create(source ->
+                this.usersApiService.getUserById(id)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                source::onSuccess,
+                                error -> {
+                                    if (error instanceof HttpException) {
+                                        HttpException httpError = (HttpException) error;
+
+                                        if (httpError.code() == 401) {
+                                            source.onError(new AuthPasswordException());
+                                        } else {
+                                            source.onError(new Exception(error));
+                                        }
+                                    } else {
+                                        source.onError(new Exception(error));
+                                    }
+                                }
+                        )
+        );
+    }
+
+    public Single<UserModel> updateUser(int id, UpdatableInfoUser update) {
+        return Single.create(source ->
+                this.usersApiService.updateUser(id, update)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                source::onSuccess,
+                                error -> {
+                                    if (error instanceof HttpException) {
+                                        HttpException httpError = (HttpException) error;
+
+                                        if (httpError.code() == 401) {
+                                            source.onError(new AuthPasswordException());
+                                        } else {
+                                            source.onError(new Exception(error));
+                                        }
+                                    } else {
+                                        source.onError(new Exception(error));
+                                    }
+                                }
+                        )
+        );
     }
 }
