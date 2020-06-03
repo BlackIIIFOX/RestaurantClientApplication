@@ -71,7 +71,27 @@ public class UsersRepository {
     }
 
     public Single<List<UserModel>> getUsers() {
-        return null;
+        return Single.create(source ->
+                this.usersApiService.getUsers()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                source::onSuccess,
+                                error -> {
+                                    if (error instanceof HttpException) {
+                                        HttpException httpError = (HttpException) error;
+
+                                        if (httpError.code() == 401) {
+                                            source.onError(new AuthPasswordException());
+                                        } else {
+                                            source.onError(new Exception(error));
+                                        }
+                                    } else {
+                                        source.onError(new Exception(error));
+                                    }
+                                }
+                        )
+        );
     }
 
     public Single<UserModel> getUserById(int id) {

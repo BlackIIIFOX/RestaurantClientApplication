@@ -15,18 +15,21 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.tamagotchi.restaurantclientapplication.R;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModel;
 import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
+import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
 
 public class SlidingPanelStillAboutMe extends BottomSheetDialogFragment {
     private static final String TAG = "SlidingPanelStillAboutMe";
 
     private MainViewModel viewModel;
     private View slidingPanelStillAboutMe;
+    private EditText editTextName;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(this, new MainViewModelFactory()).get(MainViewModel.class);
         slidingPanelStillAboutMe = inflater.inflate(R.layout.activity_still_edit_about_me, container, false);
+        editTextName = slidingPanelStillAboutMe.findViewById(R.id.editTextUserName);
 
         setName();
         editName();
@@ -35,20 +38,21 @@ public class SlidingPanelStillAboutMe extends BottomSheetDialogFragment {
     }
 
     private void setName() {
-        EditText editText = slidingPanelStillAboutMe.findViewById(R.id.editTextUserName);
-        String userName = viewModel.getUser().getValue().getFullName();
-        if (userName != null) {
-            editText.setText(userName);
+        UserModel user = viewModel.getUser().getValue();
+        if (user != null) {
+            if (user.getFullName() != null) {
+                editTextName.setText(user.getFullName());
+            } else if (user.getLogin() != null) {
+                editTextName.setText(user.getLogin());
+            }
         }
     }
 
     private void editName() {
         Button button = slidingPanelStillAboutMe.findViewById(R.id.editNameButton);
         button.setOnClickListener((view) -> {
-            EditText editText = slidingPanelStillAboutMe.findViewById(R.id.editTextUserName);
-            if (!editText.getText().toString().equals("")) {
-                viewModel.setUserName(editText.getText().toString());
-                viewModel.refreshCurrentUser();
+            if (!editTextName.getText().toString().equals("")) {
+                viewModel.setUserName(editTextName.getText().toString());
                 this.dismiss();
             }
         });

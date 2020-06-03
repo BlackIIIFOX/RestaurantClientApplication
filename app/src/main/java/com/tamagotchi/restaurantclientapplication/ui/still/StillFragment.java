@@ -23,6 +23,7 @@ import com.tamagotchi.restaurantclientapplication.ui.main.MainViewModelFactory;
 import com.tamagotchi.restaurantclientapplication.ui.slidingpanel.SlidingPanelStillAboutMe;
 import com.tamagotchi.restaurantclientapplication.ui.slidingpanel.SlidingPanelStillFeedback;
 import com.tamagotchi.tamagotchiserverprotocol.models.OrderModel;
+import com.tamagotchi.tamagotchiserverprotocol.models.UserModel;
 
 import androidx.annotation.Nullable;
 
@@ -54,8 +55,12 @@ public class StillFragment extends Fragment {
     private void initUser() {
         TextView textView = stillFragment.findViewById(R.id.userNameView);
         viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
-            if (user.getFullName() != null) {
-                textView.setText(user.getFullName());
+            if (user != null) {
+                if (user.getFullName() != null) {
+                    textView.setText(user.getFullName());
+                } else if (user.getLogin() != null) {
+                    textView.setText(user.getLogin());
+                }
             }
         });
     }
@@ -101,13 +106,6 @@ public class StillFragment extends Fragment {
 
     private void initListOrders() {
         ordersListView = stillFragment.findViewById(R.id.userOrdersList);
-
-        ordersListView.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
-            ArrayAdapter<OrderModel> adapter = (ArrayAdapter<OrderModel>) parent.getAdapter();
-            OrderModel order = adapter.getItem(position);
-            viewModel.setSelectedOrder(order);
-        });
-
         initOrdersSubscribe();
     }
 

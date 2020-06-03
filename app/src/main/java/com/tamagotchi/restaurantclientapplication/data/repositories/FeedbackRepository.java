@@ -1,7 +1,7 @@
 package com.tamagotchi.restaurantclientapplication.data.repositories;
 
-import com.tamagotchi.restaurantclientapplication.data.exceptions.AuthPasswordException;
-import com.tamagotchi.restaurantclientapplication.data.exceptions.NotFoundException;
+import com.tamagotchi.restaurantclientapplication.data.exceptions.BadRequestException;
+import com.tamagotchi.restaurantclientapplication.data.exceptions.ConflictException;
 import com.tamagotchi.tamagotchiserverprotocol.models.FeedbackCreateModel;
 import com.tamagotchi.tamagotchiserverprotocol.models.FeedbackModel;
 import com.tamagotchi.tamagotchiserverprotocol.routers.IFeedbackApiService;
@@ -39,29 +39,6 @@ public class FeedbackRepository {
     }
 
     public Single<FeedbackModel> addFeedback(FeedbackCreateModel feedback) {
-        return Single.create(source ->
-                this.feedbackApiService.addFeedback(feedback)
-                        .subscribe(
-                                source::onSuccess,
-                                error -> {
-                                    if (error instanceof HttpException) {
-                                        HttpException httpError = (HttpException) error;
-
-                                        switch (httpError.code()) {
-                                            case 401:
-                                                source.onError(new AuthPasswordException());
-                                                break;
-                                            case 404:
-                                                source.onError(new NotFoundException());
-                                                break;
-                                            default:
-                                                source.onError(new Exception(error));
-                                        }
-                                    } else {
-                                        source.onError(new Exception(error));
-                                    }
-                                }
-                        )
-        );
+        return this.feedbackApiService.addFeedback(feedback);
     }
 }
